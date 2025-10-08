@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kronborg's Ultimate Pokémon Checker</title>
+  <style>
+    /* Tailwind-like utility classes adapted for TRON theme */
+    .bg-black { background-color: #000000; }
+    .bg-dark-blue { background-color: #001122; }
+    .bg-neon-cyan { background-color: #00ffff; }
+    .bg-neon-red { background-color: #ff0040; }
+    .bg-neon-green { background-color: #00ff41; }
+    .bg-dark-gray { background-color: #1a1a1a; }
+    .text-neon-cyan { color: #00ffff; }
+    .text-neon-red { color: #ff0040; }
+    .text-neon-green { color: #00ff41; }
+    .text-white-glow { color: #ffffff; text-shadow: 0 0 5px #00ffff; }
+    .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
+    .p-6 { padding: 1.5rem; }
+    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .mt-2 { margin-top: 0.5rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .w-full { width: 100%; }
+    .max-w-md { max-width: 28rem; }
+    .rounded { border-radius: 0.25rem; }
+    .rounded-lg { border-radius: 0.5rem; }
+    .shadow-neon { box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), inset 0 0 10px rgba(0, 255, 255, 0.1); }
+    .border-neon { border: 1px solid #00ffff; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-center { justify-content: center; }
+    .min-h-screen { min-height: 100vh; }
+    .text-center { text-align: center; }
+    .hidden { display: none; }
+    .hover\:glow:hover { box-shadow: 0 0 30px rgba(0, 255, 255, 0.8) !important; transform: translateY(-2px); }
+    .hover\:bg-neon-red:hover { background-color: #ff3366; }
+    .hover\:bg-neon-green:hover { background-color: #00ff66; }
+    .hover\:bg-dark-gray:hover { background-color: #333333; }
+    /* TRON Theme Styles */
+    body {
+      font-family: 'Orbitron', monospace;
+      background: radial-gradient(ellipse at center, #001122 0%, #000011 50%, #000000 100%);
+      color: #00ffff;
+      position: relative;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #00ffff #001122;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        linear-gradient(-45deg, rgba(0,255,255,0.05) 25%, transparent 25%),
+        linear-gradient(45deg, rgba(0,255,255,0.05) 25%, transparent 25%),
+        linear-gradient(-45deg, transparent 75%, rgba(0,255,255,0.05) 75%),
+        linear-gradient(45deg, transparent 75%, rgba(0,255,255,0.05) 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+      z-index: -1;
+      animation: gridMove 20s linear infinite;
+    }
+    @keyframes gridMove {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(20px, 20px); }
+    }
+    body::-webkit-scrollbar {
+      width: 10px;
+    }
+    body::-webkit-scrollbar-track {
+      background: #001122;
+    }
+    body::-webkit-scrollbar-thumb {
+      background: #00ffff;
+      border-radius: 5px;
+      box-shadow: 0 0 5px #00ffff;
+    }
+    body::-webkit-scrollbar-thumb:hover {
+      background: #33ffff;
+      box-shadow: 0 0 10px #00ffff;
+    }
+    .tron-card {
+      background-color: rgba(0, 0, 0, 0.8);
+      border: 2px solid #00ffff;
+      border-radius: 15px;
+      padding: 1.5rem;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.05);
+      position: relative;
+      z-index: 20;
+      animation: pulseGlow 3s ease-in-out infinite alternate;
+    }
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), inset 0 0 10px rgba(0, 255, 255, 0.1); }
+      100% { box-shadow: 0 0 40px rgba(0, 255, 255, 0.8), inset 0 0 20px rgba(0, 255, 255, 0.2); }
+    }
+    .rounded, .rounded-lg {
+      border-radius: 10px !important;
+    }
+    input[type="email"], input[type="url"] {
+      border: 2px solid #00ffff;
+      background: rgba(0, 0, 0, 0.6);
+      color: #00ffff;
+      padding: 0.6rem 1rem;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 0 5px rgba(0, 255, 255, 0.2);
+    }
+    input[type="email"]:focus, input[type="url"]:focus {
+      border-color: #33ffff;
+      outline: none;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.6), inset 0 0 10px rgba(0, 255, 255, 0.3);
+    }
+    input[readonly] {
+      background-color: rgba(0, 17, 34, 0.8);
+      cursor: not-allowed;
+      color: #66ffff;
+    }
+    button {
+      font-weight: 600;
+      transition: all 0.3s ease;
+      letter-spacing: 0.05em;
+      border: 1px solid #00ffff;
+      background: transparent;
+      color: #00ffff;
+      backdrop-filter: blur(10px);
+    }
+    button:hover {
+      color: #33ffff;
+      border-color: #33ffff;
+      transform: translateY(-2px);
+    }
+    .text-center {
+      text-shadow: 0 0 10px #00ffff;
+    }
+    .input-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .input-group input {
+      flex-grow: 1;
+      margin-right: 0.5rem;
+    }
+    .remove-button {
+      background: transparent;
+      color: #ff0040;
+      border-color: #ff0040;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    .remove-button:hover {
+      background: rgba(255, 0, 64, 0.1);
+      color: #ff3366;
+      border-color: #ff3366;
+      box-shadow: 0 0 10px rgba(255, 0, 64, 0.5);
+      transform: none;
+    }
+    .submit-button {
+      background: transparent;
+      color: #00ff41;
+      border-color: #00ff41;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    .submit-button:hover {
+      background: rgba(0, 255, 65, 0.1);
+      color: #00ff66;
+      border-color: #00ff66;
+      box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+      transform: none;
+    }
+    .toggle-button.active {
+      background: rgba(0, 255, 65, 0.2);
+      color: #00ff41;
+      border-color: #00ff41;
+    }
+    .toggle-button.active:hover {
+      background: rgba(0, 255, 65, 0.3);
+      box-shadow: 0 0 15px rgba(0, 255, 65, 0.6);
+    }
+    .toggle-button.inactive {
+      background: transparent;
+      color: #666666;
+      border-color: #666666;
+    }
+    .toggle-button.inactive:hover {
+      background: rgba(102, 102, 102, 0.1);
+      color: #999999;
+      border-color: #999999;
+      box-shadow: 0 0 10px rgba(102, 102, 102, 0.3);
+    }
+    .add-email-button {
+      background: linear-gradient(45deg, rgba(0, 255, 65, 0.2), rgba(0, 255, 255, 0.2));
+      color: #00ff41;
+      border: 2px solid #00ff41;
+      padding: 0.75rem 1rem;
+      border-radius: 15px;
+      cursor: pointer;
+      font-weight: 700;
+      margin-top: 0.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .add-email-button::before {
+      content: '✨';
+      position: absolute;
+      left: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      transition: left 0.3s ease;
+    }
+    .add-email-button:hover {
+      background: linear-gradient(45deg, rgba(0, 255, 65, 0.4), rgba(0, 255, 255, 0.4));
+      box-shadow: 0 0 25px rgba(0, 255, 65, 0.8), 0 0 40px rgba(0, 255, 255, 0.4);
+      transform: translateY(-3px) scale(1.02);
+    }
+    .add-email-button:hover::before {
+      left: 10px;
+    }
+    .add-email-button:active {
+      transform: translateY(-1px) scale(1);
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 8px;
+      background: rgba(0, 255, 255, 0.2);
+      border-radius: 5px;
+      outline: none;
+      margin-top: 0.5rem;
+      cursor: pointer;
+      box-shadow: inset 0 0 5px rgba(0, 255, 255, 0.1);
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #00ffff;
+      border-radius: 50%;
+      border: 2px solid #000;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: #00ffff;
+      border-radius: 50%;
+      border: 2px solid #000;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+    }
+    .status-feedback {
+      color: #00ff41;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      text-shadow: 0 0 5px #00ff41;
+    }
+    .status-feedback.show {
+      opacity: 1;
+    }
+    .status-neon-green {
+      color: #00ff41;
+      text-shadow: 0 0 10px #00ff41;
+    }
+    .status-neon-red {
+      color: #ff0040;
+      text-shadow: 0 0 10px #ff0040;
+    }
+    .start-button {
+      background: transparent;
+      color: #00ffff;
+      border-color: #00ffff;
+      padding: 0.75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      width: 100%;
+    }
+    .start-button:hover {
+      background: rgba(0, 255, 255, 0.2);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+    }
+    .stop-button {
+      background: transparent;
+      color: #ff0040;
+      border-color: #ff0040;
+      padding: 0.75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+    .stop-button:hover {
+      background: rgba(255, 0, 64, 0.2);
+      box-shadow: 0 0 20px rgba(255, 0, 64, 0.8);
+    }
+    .test-button {
+      background: transparent;
+      color: #00ff41;
+      border-color: #00ff41;
+      padding: 0.75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+    .test-button:hover {
+      background: rgba(0, 255, 65, 0.2);
+      box-shadow: 0 0 20px rgba(0, 255, 65, 0.8);
+    }
+    .toggle-button {
+      background: transparent;
+      color: #00ffff;
+      border-color: #00ffff;
+      padding: 0.75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+    .toggle-button:hover {
+      background: rgba(0, 255, 255, 0.2);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+    }
+    .pokezonan-button {
+      background: linear-gradient(45deg, rgba(255, 0, 64, 0.3), rgba(0, 255, 255, 0.2));
+      color: #ff0040;
+      border: 2px solid #ff0040;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      margin-left: 0.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .pokezonan-button::before {
+      content: '🎮';
+      position: absolute;
+      left: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      transition: left 0.3s ease;
+    }
+    .pokezonan-button:hover {
+      background: linear-gradient(45deg, rgba(255, 0, 64, 0.5), rgba(0, 255, 255, 0.4));
+      box-shadow: 0 0 20px rgba(255, 0, 64, 0.8);
+      transform: translateY(-2px);
+    }
+    .pokezonan-button:hover::before {
+      left: 10px;
+    }
+    h1 {
+      color: #00ffff;
+      text-shadow: 0 0 15px #00ffff, 0 0 30px #00ffff;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+    p {
+      color: #66ffff;
+      text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+    }
+    label {
+      color: #66ffff;
+      text-shadow: 0 0 3px #00ffff;
+    }
+    @media (max-height: 600px) {
+      .tron-card {
+        padding: 1rem;
+      }
+      .text-2xl {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+      }
+      .p-6 {
+        padding: 1rem;
+      }
+    }
+    @media (max-height: 400px) {
+      .tron-card {
+        padding: 0.5rem;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="bg-black flex items-center justify-center min-h-screen">
+  <div class="tron-card p-6 rounded-lg shadow-neon w-full max-w-md">
+    <h1 class="text-2xl font-bold text-center mb-2">Kronborg's Ultimate Pokémon Checker</h1>
+    <p class="text-gray-600 text-center mb-2 text-sm">Checks to see if the shop is accessible.</p>
+    <div id="emailInputsContainer" class="mb-2">
+      <label class="block text-sm text-neon-cyan mb-1">Emails for alerts:</label>
+      <div class="input-group">
+        <input type="email" placeholder="name@example.com" class="w-full border-neon rounded px-3 py-2 email-input" required>
+        <button type="button" class="submit-button email-submit-button">Submit</button>
+      </div>
+    </div>
+    <button id="addEmailButton" class="w-full add-email-button mb-2">Catch Another Email! ✨</button>
+    <div id="discordWebhookContainer" class="mb-2">
+      <label class="block text-sm text-neon-cyan mb-1">Discord Webhook URL:</label>
+      <div class="input-group">
+        <input
+          type="url"
+          id="webhookUrlInput"
+          placeholder="https://discord.com/api/webhooks/1418654823745716436/vuMKu1s095Cq3BfU06OF_Z_mwxG39zHppHJ3c4BX5X38WuJFWPGhIZdopWTEEXlophiN"
+          class="w-full border-neon rounded px-3 py-2"
+          required
+        >
+        <button type="button" id="submitWebhookButton" class="submit-button">Add Webhook</button>
+        <button id="addPokezonanButton" class="pokezonan-button" type="button">Add Pokezonan</button>
+      </div>
+    </div>
+    <div id="emailFeedback" class="status-feedback"></div>
+    <div class="mb-2">
+      <label for="frequencySlider" class="block text-sm text-neon-cyan mb-1">
+        Check every: <span id="frequencyValue" class="font-semibold text-white-glow">10</span> minutes
+      </label>
+      <input type="range" id="frequencySlider" min="1" max="60" value="10">
+    </div>
+    <div id="status" class="text-center mb-2">
+      <p class="text-lg">Status: <span id="statusText" class="font-semibold status-neon-red">Waiting...</span></p>
+      <p class="text-sm text-neon-cyan">Last checked: <span id="lastChecked">Never</span></p>
+      <p class="text-sm text-neon-cyan">System running for: <span id="runTime">0h 0m 0s</span></p>
+      <p class="text-sm text-neon-cyan">Details: <span id="statusDetails">None</span></p>
+    </div>
+    <button id="startButton" class="start-button">Start Checking</button>
+    <button id="stopButton" class="stop-button hidden">Stop Checking</button>
+    <button id="emailToggleButton" class="toggle-button active w-full mt-2">Deactivate Email Alerts</button>
+    <button id="discordToggleButton" class="toggle-button active w-full mt-2">Deactivate Discord Alerts</button>
+    <button id="testEmailButton" class="test-button">Test Email</button>
+  </div>
+  <audio id="beepSound">
+    <source src="https://www.soundjay.com/buttons/beep-01a.mp3" type="audio/mpeg">
+    Your browser does support the audio element.
+  </audio>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script type="text/javascript">
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+      return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
+      if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+        try {
+          var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+          var firstSheetName = workbook.SheetNames[0];
+          var worksheet = workbook.Sheets[firstSheetName];
+          var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+          var filteredData = jsonData.filter(row => row.some(filledCell));
+          var headerRowIndex = filteredData.findIndex((row, index) =>
+            row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+          );
+          if (headerRowIndex === -1 || headerRowIndex > 25) {
+            headerRowIndex = 0;
+          }
+          var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+          csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+          return csv;
+        } catch (e) {
+          console.error(e);
+          return "";
+        }
+      }
+      return gk_fileData[filename] || "";
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
+  <script>
+    if (typeof emailjs === 'undefined') {
+      console.error('EmailJS failed to load. Please check the CDN URL or network connection.');
+      alert('Email functionality is unavailable. Please check your network connection and try again.');
+    } else {
+      emailjs.init({
+        // NEW PUBLIC KEY: 8w7eu6mrg3lRl6ta3
+        publicKey: "8w7eu6mrg3lRl6ta3"
+      });
+    }
+    // --- DOM Selectors ---
+    const statusText = document.getElementById('statusText');
+    const lastChecked = document.getElementById('lastChecked');
+    const statusDetails = document.getElementById('statusDetails');
+    const startButton = document.getElementById('startButton');
+    const stopButton = document.getElementById('stopButton');
+    const testEmailButton = document.getElementById('testEmailButton');
+    const emailToggleButton = document.getElementById('emailToggleButton');
+    const discordToggleButton = document.getElementById('discordToggleButton');
+    const webhookUrlInput = document.getElementById('webhookUrlInput');
+    const submitWebhookButton = document.getElementById('submitWebhookButton');
+    const addPokezonanButton = document.getElementById('addPokezonanButton');
+    const beepSound = document.getElementById('beepSound');
+    const runTime = document.getElementById('runTime');
+    const emailInputsContainer = document.getElementById('emailInputsContainer');
+    const addEmailButton = document.getElementById('addEmailButton');
+    const emailFeedback = document.getElementById('emailFeedback');
+    const frequencySlider = document.getElementById('frequencySlider');
+    const frequencyValue = document.getElementById('frequencyValue');
+    // --- Global Variables ---
+    let intervalId = null;
+    let startTime = null;
+    let timerInterval = null;
+    let currentCheckInterval = 10 * 60 * 1000;
+    let emailNotificationsEnabled = true;
+    let discordNotificationsEnabled = true;
+    let discordWebhookUrl = null;
+    // --- Utility Functions ---
+    function showEmailFeedback(message) {
+      emailFeedback.textContent = message;
+      emailFeedback.classList.add('show');
+      setTimeout(() => {
+        emailFeedback.classList.remove('show');
+      }, 2000);
+    }
+    function getRandomInterval(baseInterval) {
+      const variation = Math.floor(Math.random() * (120000 - 60000 + 1)) + 60000;
+      const randomSign = Math.random() < 0.5 ? -1 : 1;
+      return baseInterval + (randomSign * variation);
+    }
+    function formatDuration(ms) {
+      const seconds = Math.floor(ms / 1000);
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      return `${hours}h ${minutes}m ${secs}s`;
+    }
+    function updateRunTime() {
+      if (startTime) {
+        const now = Date.now();
+        runTime.textContent = formatDuration(now - startTime);
+      }
+    }
+    function startTimer() {
+      if (!startTime) {
+        startTime = Date.now();
+        timerInterval = setInterval(updateRunTime, 2000);
+      }
+    }
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      startTime = null;
+      runTime.textContent = '0h 0m 0s';
+    }
+    function playThreeBeeps() {
+      let beepCount = 0;
+      const beepInterval = setInterval(() => {
+        if (beepCount < 3) {
+          beepSound.currentTime = 0;
+          beepSound.play().catch(() => console.log('Audio playback failed'));
+          beepCount++;
+        } else {
+          clearInterval(beepInterval);
+          beepSound.pause();
+          beepSound.currentTime = 0;
+        }
+      }, 1500);
+    }
+    function extractQueueLength(text) {
+      const patterns = [
+        /(\d+)\s*users?\s*ahead/i,
+        /queue\s*position\s*[:=]?\s*(\d+)/i,
+        /(\d+)\s*in\s*queue/i,
+        /position\s*in\s*queue\s*[:=]?\s*(\d+)/i
+      ];
+      for (const pattern of patterns) {
+        const match = text.match(pattern);
+        if (match) return match[1];
+      }
+      return null;
+    }
+    // --- Notification Functions ---
+    async function sendDiscordMessage(status, details) {
+      if (!discordNotificationsEnabled || !discordWebhookUrl) {
+        console.log('Discord notifications are disabled or no webhook URL provided; skipping message sending.');
+        return;
+      }
+     
+      const isAccessible = status.includes('accessible') && !status.includes('not accessible');
+      const color = isAccessible ? 3066993 : 15158332; // Green for accessible, Red for errors/inaccessible
+     
+      const payload = {
+        embeds: [{
+          title: isAccessible ? `🔥 POKÉMON SHOP UNLOCKED! 🚀` : `⚠️ SHOP LOCKED DOWN! EMERGENCY ALERT! ⚠️`,
+          description: `**Status:** ${status}\n**Details:** ${details}\n\nGotta catch 'em all – or at least check the stock! 🎮✨`,
+          color: color,
+          thumbnail: {
+            url: isAccessible ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png' : 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png'
+          },
+          timestamp: new Date().toISOString(),
+          footer: {
+            text: 'Kronborg\'s Ultimate Pokémon Checker'
+          }
+        }]
+      };
+     
+      try {
+        const response = await fetch(discordWebhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+        if (response.ok) {
+          console.log('Discord message sent successfully.');
+          // Deactivate Discord alerts after sending a successful alert (for non-accessible statuses)
+          if (!isAccessible) {
+             discordNotificationsEnabled = false;
+             discordToggleButton.textContent = 'Activate Discord Alerts';
+             discordToggleButton.classList.remove('active');
+             discordToggleButton.classList.add('inactive');
+             showEmailFeedback('🚨 Discord alert sent – notifications paused to avoid spam! 🔥');
+          }
+        } else {
+          console.error('Failed to send Discord message:', response.status, response.statusText);
+          showEmailFeedback('Discord alert failed – check your webhook! ⚠️');
+        }
+      } catch (error) {
+        console.error('Error sending Discord message:', error);
+        showEmailFeedback('Discord connection error – try again! 🔌');
+      }
+    }
+    function sendEmail(status, details, recipientEmails) {
+      if (!emailNotificationsEnabled) {
+        console.log('Email notifications are disabled; skipping email sending.');
+        return;
+      }
+      if (!recipientEmails || recipientEmails.length === 0) {
+        console.error('No email addresses provided for sending alerts');
+        return;
+      }
+      if (typeof emailjs === 'undefined') {
+        console.error('EmailJS is not available');
+        return;
+      }
+      const coolDetails = `**🚨 ULTIMATE ALERT! 🚨**\n\nStatus: ${status}\n\n${details}\n\nGotta check 'em all! 🎉 Kronborg's Checker has your back!`;
+      recipientEmails.forEach(email => {
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          console.warn(`Invalid email address: ${email}. Skipping.`);
+          return;
+        }
+        emailjs.send("service_ahqdaj5", "template_whhvnra", {
+          status: status,
+          details: coolDetails,
+          timestamp: new Date().toLocaleString(),
+          to_email: email
+        }).then(
+          () => console.log('Email sent successfully to', email),
+          (error) => console.error('Failed to send email to', email, ':', error)
+        );
+      });
+      emailNotificationsEnabled = false;
+      emailToggleButton.textContent = 'Activate Email Alerts';
+      emailToggleButton.classList.remove('active');
+      emailToggleButton.classList.add('inactive');
+      showEmailFeedback('📧 Email blast sent – alerts paused to prevent overload! ⚡');
+    }
+    function testEmail() {
+      const emailInputs = document.querySelectorAll('.email-input');
+      const recipientEmails = [];
+      let hasValidEmail = true;
+      Array.from(emailInputs).forEach((input, index) => {
+        const email = input.value.trim();
+        if (email && input.hasAttribute('readonly')) {
+          if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            recipientEmails.push(email);
+          } else {
+            alert(`Please ensure email ${index + 1} is valid: ${email}`);
+            input.focus();
+            hasValidEmail = false;
+          }
+        }
+      });
+      if (!hasValidEmail) {
+        return;
+      }
+      if (recipientEmails.length === 0) {
+        console.warn('No valid email addresses provided.');
+        alert('No valid email addresses provided.');
+        return;
+      }
+      if (!emailNotificationsEnabled) {
+        console.warn('Email notifications are disabled; cannot send test email.');
+        alert('Email notifications are disabled. Please activate email notifications to send a test email.');
+        return;
+      }
+      if (typeof emailjs === 'undefined') {
+        alert('Email functionality is unavailable. Please check your network connection and try again.');
+        return;
+      }
+      console.log('Sending test email to:', recipientEmails);
+      sendEmail('🧪 Test Alert', `This is a super cool test from Kronborg's Ultimate Pokémon Checker! 🎮🔥\n\nReady to catch those rare drops? The shop monitor is primed and waiting!`, recipientEmails);
+      alert('Test emails fired off! Check your inbox (and spam) for the epic alert! 🚀');
+    }
+    // --- Core Logic ---
+    async function checkShopAccess() {
+      const emailInputs = document.querySelectorAll('.email-input');
+      const currentEmails = [];
+      Array.from(emailInputs)
+        .filter(input => input.hasAttribute('readonly'))
+        .map(input => input.value.trim())
+        .filter(email => email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        .forEach(email => currentEmails.push(email));
+      console.log('Emails for notifications:', currentEmails);
+      console.log('Discord Webhook URL:', discordWebhookUrl ? 'Set' : 'Not Set');
+      try {
+        const proxies = [
+          'https://corsproxy.io/?',
+          'https://cors-anywhere.herokuapp.com/',
+          'https://allorigins.win/raw?url='
+        ];
+        const targetUrls = [
+          'https://www.pokemoncenter.com/',
+          'https://www.pokemoncenter.com/category/trading-card-game'
+        ];
+        let response = null;
+        let proxyUsed = '';
+        let urlUsed = '';
+        let proxyErrors = [];
+        for (const targetUrl of targetUrls) {
+          for (const proxy of proxies) {
+            try {
+              response = await fetch(proxy + encodeURIComponent(targetUrl), {
+                method: 'GET',
+                headers: {
+                  'Accept': 'text/html',
+                },
+              });
+              proxyUsed = proxy;
+              urlUsed = targetUrl;
+              if (response.ok && response.status === 200) break;
+              proxyErrors.push(`Proxy ${proxy} for ${targetUrl} returned status: ${response?.status || 'unknown'}`);
+            } catch (proxyError) {
+              proxyErrors.push(`Proxy ${proxy} for ${targetUrl} failed: ${proxyError.message}`);
+              console.warn(`Proxy ${proxy} for ${targetUrl} failed:`, proxyError);
+            }
+            if (response && response.ok && response.status === 200) break;
+          }
+          if (response && response.ok && response.status === 200) break;
+        }
+        const now = new Date().toLocaleTimeString();
+        lastChecked.textContent = now;
+        if (!response || !response.ok) {
+          const status = 'Proxy error';
+          const details = `Failed to fetch page through all proxies. Errors: ${proxyErrors.join('; ')}. Please check the site manually.`;
+          statusText.textContent = status;
+          statusText.classList.remove('status-neon-green');
+          statusText.classList.add('status-neon-red');
+          statusDetails.textContent = details;
+          playThreeBeeps();
+         
+          if (statusText.dataset.previousStatus !== status) {
+            if (emailNotificationsEnabled) sendEmail(status, details, currentEmails);
+            if (discordNotificationsEnabled && discordWebhookUrl) sendDiscordMessage(status, details);
+          }
+          statusText.dataset.previousStatus = status;
+          return;
+        }
+        const finalUrl = decodeURIComponent(response.url.replace(proxyUsed, ''));
+        const text = await response.text();
+        const isQueue =
+          /queue-it\.net/i.test(finalUrl) ||
+          /waiting room|queue-it|waitingroom|virtual waiting/i.test(text);
+        if (isQueue) {
+          const queueLength = extractQueueLength(text);
+          const currentStatus = 'Shop is active (in queue)';
+          statusText.textContent = currentStatus;
+          statusText.classList.remove('status-neon-red');
+          statusText.classList.add('status-neon-green');
+          const details = `Queue detected at ${finalUrl} (checked ${urlUsed}). Queue length: ${queueLength || 'unknown'}. Redirecting to Pokémon Center homepage.`;
+          statusDetails.textContent = details;
+          playThreeBeeps();
+         
+          if (statusText.dataset.previousStatus !== currentStatus) {
+            if (emailNotificationsEnabled) sendEmail(currentStatus, details, currentEmails);
+            if (discordNotificationsEnabled && discordWebhookUrl) sendDiscordMessage(currentStatus, details);
+          }
+          statusText.dataset.previousStatus = currentStatus;
+          stopChecking();
+          window.location.href = 'https://www.pokemoncenter.com/';
+          return;
+        } else if (/pokemoncenter\.com(\/|$|\/category\/trading-card-game)/i.test(finalUrl)) {
+          const hasShopContent = /shop|products|category|store|cart|new releases|all products|add to cart|merchandise|collectibles|plush|trading card|Pokémon/i.test(text);
+          const hasDynamicElements = /<nav\b|<a\b[^>]*href=["'][^"']*product[^"']*["']|<div\b[^>]*class=["'][^"']*product[^"']*["']/i.test(text);
+          const isLargeResponse = text.length > 10000;
+          if (hasShopContent || hasDynamicElements || isLargeResponse) {
+            const currentStatus = 'Shop is accessible!';
+            statusText.textContent = currentStatus;
+            statusText.classList.remove('status-neon-red');
+            statusText.classList.add('status-neon-green');
+            statusDetails.textContent = `Reached ${finalUrl} (checked ${urlUsed}), shop content detected (keywords or dynamic elements present). Response length: ${text.length} chars.`;
+            statusText.dataset.previousStatus = currentStatus;
+          } else {
+            const currentStatus = 'Shop is not accessible (landing page)';
+            statusText.textContent = currentStatus;
+            statusText.classList.remove('status-neon-green');
+            statusText.classList.add('status-neon-red');
+            const details = `Reached ${finalUrl} (checked ${urlUsed}), but no shop content or dynamic elements found. Likely a static landing page. Response length: ${text.length} chars.`;
+            statusDetails.textContent = details;
+            playThreeBeeps();
+            if (statusText.dataset.previousStatus !== currentStatus) {
+              if (emailNotificationsEnabled) sendEmail(currentStatus, details, currentEmails);
+              if (discordNotificationsEnabled && discordWebhookUrl) sendDiscordMessage(currentStatus, details);
+            }
+            statusText.dataset.previousStatus = currentStatus;
+          }
+        } else {
+          const currentStatus = 'Shop is not accessible (unexpected page)';
+          statusText.textContent = currentStatus;
+          statusText.classList.remove('status-neon-green');
+          statusText.classList.add('status-neon-red');
+          const details = `Reached ${finalUrl} (checked ${urlUsed}), but it does not appear to be the Pokémon Center shop. Response length: ${text.length} chars.`;
+          statusDetails.textContent = details;
+          playThreeBeeps();
+          if (statusText.dataset.previousStatus !== currentStatus) {
+            if (emailNotificationsEnabled) sendEmail(currentStatus, details, currentEmails);
+            if (discordNotificationsEnabled && discordWebhookUrl) sendDiscordMessage(currentStatus, details);
+          }
+          statusText.dataset.previousStatus = currentStatus;
+        }
+      } catch (error) {
+        console.error('Error checking page:', error);
+        const status = 'Site is down';
+        const details = `Failed to fetch: ${error.message}. Please check the site manually.`;
+        statusText.textContent = status;
+        statusText.classList.remove('status-neon-green');
+        statusText.classList.add('status-neon-red');
+        statusDetails.textContent = details;
+        lastChecked.textContent = new Date().toLocaleTimeString();
+        playThreeBeeps();
+        if (statusText.dataset.previousStatus !== status) {
+          if (emailNotificationsEnabled) sendEmail(status, details, currentEmails);
+          if (discordNotificationsEnabled && discordWebhookUrl) sendDiscordMessage(status, details);
+        }
+        statusText.dataset.previousStatus = status;
+      }
+    }
+    function startChecking() {
+      const emailInputs = document.querySelectorAll('.email-input');
+      let allEmailsSubmitted = true;
+      let hasAtLeastOneValidContact = false;
+      // 1. Check Emails for submission status and validity
+      Array.from(emailInputs).forEach((input, index) => {
+        const email = input.value.trim();
+        if (email && !input.hasAttribute('readonly')) {
+          alert('Please submit all email addresses before starting.');
+          input.focus();
+          allEmailsSubmitted = false;
+        } else if (email && input.hasAttribute('readonly')) {
+          if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            hasAtLeastOneValidContact = true;
+          }
+        }
+      });
+      if (!allEmailsSubmitted) {
+        return;
+      }
+      // 2. Check Discord Webhook for submission status
+      if (webhookUrlInput.value.trim() && webhookUrlInput.hasAttribute('readonly')) {
+        // If webhook is set and readonly (submitted)
+        hasAtLeastOneValidContact = true;
+      }
+      // 3. Final validation check
+      if (!hasAtLeastOneValidContact) {
+        console.warn('No valid notification contacts provided.');
+        alert('Please submit at least one valid email address OR a Discord Webhook URL.');
+        return;
+      }
+      if (intervalId) {
+        clearTimeout(intervalId);
+      }
+      function scheduleNextCheck() {
+        currentCheckInterval = parseInt(frequencySlider.value) * 60 * 1000;
+        const randomizedInterval = getRandomInterval(currentCheckInterval);
+        console.log(`Next check in ${randomizedInterval / 1000 / 60} minutes`);
+        intervalId = setTimeout(() => {
+          checkShopAccess();
+          scheduleNextCheck();
+        }, randomizedInterval);
+      }
+     
+      // Perform initial check immediately
+      checkShopAccess();
+      scheduleNextCheck();
+     
+      startButton.classList.add('hidden');
+      stopButton.classList.remove('hidden');
+      statusText.textContent = 'Checking...';
+      statusDetails.textContent = 'Started checking with randomized intervals.';
+      startTimer();
+    }
+   
+    function stopChecking() {
+      if (intervalId) {
+        clearTimeout(intervalId);
+        intervalId = null;
+        startButton.classList.remove('hidden');
+        stopButton.classList.add('hidden');
+        statusText.textContent = 'Stopped.';
+        statusDetails.textContent = 'Checking stopped.';
+        stopTimer();
+      }
+    }
+    // --- Event Listeners and Initialization ---
+    // Email Toggle Logic
+    emailToggleButton.addEventListener('click', () => {
+      emailNotificationsEnabled = !emailNotificationsEnabled;
+      if (emailNotificationsEnabled) {
+        emailToggleButton.textContent = 'Deactivate Email Alerts';
+        emailToggleButton.classList.remove('inactive');
+        emailToggleButton.classList.add('active');
+      } else {
+        emailToggleButton.textContent = 'Activate Email Alerts';
+        emailToggleButton.classList.remove('active');
+        emailToggleButton.classList.add('inactive');
+      }
+      showEmailFeedback(`Email notifications ${emailNotificationsEnabled ? 'activated – ready for epic alerts!' : 'deactivated.'}`);
+    });
+    // Discord Webhook Submission/Removal Logic
+    submitWebhookButton.addEventListener('click', function() {
+      const url = webhookUrlInput.value.trim();
+      const validUrlPattern = /^https:\/\/discord\.com\/api\/webhooks\/\d+\/[a-zA-Z0-9_-]+$/;
+     
+      if (!url || !validUrlPattern.test(url)) {
+        alert('Please enter a valid Discord Webhook URL. It should start with "https://discord.com/api/webhooks/".');
+        webhookUrlInput.focus();
+        return;
+      }
+      if (webhookUrlInput.hasAttribute('readonly')) {
+        // Remove functionality
+        webhookUrlInput.removeAttribute('readonly');
+        webhookUrlInput.value = webhookUrlInput.placeholder; // Reset to placeholder default on removal
+        discordWebhookUrl = null;
+        submitWebhookButton.textContent = 'Add Webhook';
+        submitWebhookButton.classList.remove('remove-button');
+        submitWebhookButton.classList.add('submit-button');
+        showEmailFeedback('Discord webhook removed – alerts unlinked! 🔓');
+      } else {
+        // Submit functionality
+        webhookUrlInput.setAttribute('readonly', 'true');
+        discordWebhookUrl = url;
+        submitWebhookButton.textContent = 'Remove';
+        submitWebhookButton.classList.remove('submit-button');
+        submitWebhookButton.classList.add('remove-button');
+        showEmailFeedback('Discord webhook added – ready for blazing alerts! 🚀');
+        console.log('Submitted Webhook URL:', discordWebhookUrl);
+      }
+    });
+    // Add Pokezonan Button Logic
+    addPokezonanButton.addEventListener('click', function() {
+      const defaultWebhook = webhookUrlInput.placeholder;
+      discordWebhookUrl = defaultWebhook;
+      webhookUrlInput.setAttribute('readonly', 'true');
+      webhookUrlInput.value = 'Pokezonan Webhook Activated 🔒';
+      submitWebhookButton.textContent = 'Remove';
+      submitWebhookButton.classList.remove('submit-button');
+      submitWebhookButton.classList.add('remove-button');
+      showEmailFeedback('Pokezonan webhook added – channel locked and loaded! 🎮');
+    });
+    // Discord Webhook Toggle Logic
+    discordToggleButton.addEventListener('click', () => {
+      discordNotificationsEnabled = !discordNotificationsEnabled;
+      if (discordNotificationsEnabled) {
+        discordToggleButton.textContent = 'Deactivate Discord Alerts';
+        discordToggleButton.classList.remove('inactive');
+        discordToggleButton.classList.add('active');
+      } else {
+        discordToggleButton.textContent = 'Activate Discord Alerts';
+        discordToggleButton.classList.remove('active');
+        discordToggleButton.classList.add('inactive');
+      }
+      showEmailFeedback(`Discord notifications ${discordNotificationsEnabled ? 'activated – channel primed!' : 'deactivated.'}`);
+    });
+    // Existing Email Submission Logic
+    function addEmailInputField() {
+      const emailInputGroup = document.createElement('div');
+      emailInputGroup.className = 'input-group';
+      emailInputGroup.innerHTML = `
+        <input type="email" placeholder="name@example.com" class="w-full border-neon rounded px-3 py-2 email-input" required>
+        <button type="button" class="submit-button email-submit-button">Submit</button>
+      `;
+      emailInputsContainer.appendChild(emailInputGroup);
+      // Trigger animation
+      emailInputGroup.style.opacity = '0';
+      emailInputGroup.style.transform = 'translateY(-10px)';
+      setTimeout(() => {
+        emailInputGroup.style.transition = 'all 0.5s ease-in-out';
+        emailInputGroup.style.opacity = '1';
+        emailInputGroup.style.transform = 'translateY(0)';
+      }, 10);
+      const submitButton = emailInputGroup.querySelector('.email-submit-button');
+      const emailInput = emailInputGroup.querySelector('.email-input');
+      submitButton.addEventListener('click', function() {
+        const email = emailInput.value.trim();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          alert('Please enter a valid email address.');
+          emailInput.focus();
+          return;
+        }
+        emailInput.setAttribute('readonly', 'true');
+        submitButton.remove();
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'remove-button';
+        removeButton.textContent = 'Remove';
+        emailInputGroup.appendChild(removeButton);
+        removeButton.addEventListener('click', function() {
+          emailInputGroup.style.transition = 'all 0.3s ease-out';
+          emailInputGroup.style.opacity = '0';
+          emailInputGroup.style.transform = 'translateY(-10px)';
+          setTimeout(() => {
+            emailInputGroup.remove();
+            showEmailFeedback('Email removed – back to base! 🗑️');
+          }, 300);
+        });
+        showEmailFeedback('Email added – alert ready! 📧');
+        console.log('Submitted email:', email);
+      });
+      showEmailFeedback('New email field added – expand your alert team! ➕');
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      // Handle initial email submission listener
+      const initialInputGroup = emailInputsContainer.querySelector('.input-group');
+      if (initialInputGroup) {
+        const initialInput = initialInputGroup.querySelector('.email-input');
+        const submitButton = initialInputGroup.querySelector('.email-submit-button');
+       
+        if (submitButton) {
+          submitButton.addEventListener('click', function() {
+            const email = initialInput.value.trim();
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+              alert('Please enter a valid email address.');
+              initialInput.focus();
+              return;
+            }
+            initialInput.setAttribute('readonly', 'true');
+            submitButton.remove();
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'remove-button';
+            removeButton.textContent = 'Remove';
+            initialInputGroup.appendChild(removeButton);
+            removeButton.addEventListener('click', function() {
+              initialInputGroup.style.transition = 'all 0.3s ease-out';
+              initialInputGroup.style.opacity = '0';
+              initialInputGroup.style.transform = 'translateY(-10px)';
+              setTimeout(() => {
+                initialInputGroup.remove();
+                showEmailFeedback('Email removed – back to base! 🗑️');
+              }, 300);
+            });
+            showEmailFeedback('Email added – alert ready! 📧');
+            console.log('Submitted email:', email);
+          });
+        }
+      }
+     
+      // Ensure toggle button classes are correct
+      emailToggleButton.classList.remove('email-toggle-button');
+      emailToggleButton.classList.add('toggle-button');
+      // Set initial webhook value from placeholder
+      webhookUrlInput.value = webhookUrlInput.placeholder;
+    });
+   
+    // Existing Event Listeners
+    addEmailButton.addEventListener('click', addEmailInputField);
+    frequencySlider.addEventListener('input', function() {
+      frequencyValue.textContent = this.value;
+      if (intervalId) {
+        stopChecking();
+        startChecking();
+      }
+    });
+   
+    startButton.addEventListener('click', startChecking);
+    stopButton.addEventListener('click', stopChecking);
+    testEmailButton.addEventListener('click', testEmail);
+  </script>
+</body>
+</html>
