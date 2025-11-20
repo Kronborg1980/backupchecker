@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kronborg's Ultimate Pokémon Checker v2.1</title>
+  <title>Kronborg's Ultimate Pokémon Checker v2.3</title>
   <style>
     /* Tailwind-like utility classes adapted for TRON theme */
     .bg-black { background-color: #000000; }
@@ -460,21 +460,24 @@
           const finalUrl = response.url;
 
           const isQueue = /queue-it|waiting room/i.test(text) || /queue/i.test(finalUrl);
-          const isShopLoaded = /Add to Cart|shopping_cart/i.test(text);
+          
+          // --- FIXED LOGIC: Matching your specific strings ---
+          const isShopLoaded = /Sign In|Register|My Cart|New Releases|Trading Card Game|Plush/i.test(text);
           const isAccessDenied = /Access Denied|Just a moment|Cloudflare/i.test(text);
 
           if (isQueue) {
               const qLen = extractQueueLength(text) || "Unknown";
               handleAlert("Queue Detected!", `In queue. Position: ${qLen}`, currentEmails);
-          } else if (isShopLoaded) {
-              handleAlert("Shop Accessible!", "Add to Cart buttons detected.", currentEmails);
+          } else if (isShopLoaded && !isAccessDenied) {
+              // SUCCESS CASE
+              handleAlert("Shop Accessible!", "Menu/Shop navigation detected.", currentEmails);
           } else if (isAccessDenied) {
               statusText.textContent = "Bot Blocked";
               statusDetails.textContent = "PokemonCenter is blocking the proxy (Cloudflare).";
           } else {
-              statusText.textContent = "Site Reachable (No Stock Detected)";
+              statusText.textContent = "Site Reachable (Empty)";
               statusText.className = 'font-semibold text-white-glow';
-              statusDetails.textContent = `Checked. No queue, but no clear 'Add to Cart' buttons found. Size: ${text.length}`;
+              statusDetails.textContent = `Checked. No queue, but content mismatch. Size: ${text.length}`;
           }
 
       } catch (e) {
@@ -574,20 +577,15 @@
       }
     });
 
-    // --- POKEZONAN BUTTON LOGIC (Updated) ---
+    // --- POKEZONAN BUTTON LOGIC ---
     addPokezonanButton.addEventListener('click', () => {
         const pokezonanUrl = "https://discord.com/api/webhooks/1418654823745716436/vuMKu1s095Cq3BfU06OF_Z_mwxG39zHppHJ3c4BX5X38WuJFWPGhIZdopWTEEXlophiN";
         
         discordWebhookUrl = pokezonanUrl;
-        
-        // Update UI to show it's loaded (masked for cleanliness)
         webhookUrlInput.value = "Pokezonan Webhook Loaded 🔒";
         webhookUrlInput.setAttribute('readonly', true);
-        
-        // Change the add button to remove
         submitWebhookButton.textContent = 'Remove';
         submitWebhookButton.classList.replace('submit-button', 'remove-button');
-        
         showEmailFeedback('Pokezonan Webhook Connected! 🎮');
     });
 
