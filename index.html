@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kronborg's Ultimate Pokémon Checker v2.3</title>
+  <title>Kronborg's Ultimate Pokémon Checker v2.4</title>
   <style>
     /* Tailwind-like utility classes adapted for TRON theme */
     .bg-black { background-color: #000000; }
@@ -169,6 +169,7 @@
     .status-feedback.show { opacity: 1; }
     .status-neon-green { color: #00ff41; text-shadow: 0 0 10px #00ff41; }
     .status-neon-red { color: #ff0040; text-shadow: 0 0 10px #ff0040; }
+    .status-neon-yellow { color: #ffff00; text-shadow: 0 0 10px #ffff00; }
 
     h1 { color: #00ffff; text-shadow: 0 0 15px #00ffff; font-weight: 900; letter-spacing: 2px; }
   </style>
@@ -229,7 +230,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
   <script>
-    // --- AUDIO (Embedded Base64 for Reliability) ---
+    // --- AUDIO ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playBeep() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -293,7 +294,6 @@
     }
 
     function getRandomInterval(baseInterval) {
-      // Add randomness to look less like a bot (+/- 30 seconds)
       const variation = Math.floor(Math.random() * 60000); 
       return baseInterval + variation;
     }
@@ -459,23 +459,46 @@
           const text = await response.text();
           const finalUrl = response.url;
 
+          // DETECTION LOGIC
           const isQueue = /queue-it|waiting room/i.test(text) || /queue/i.test(finalUrl);
           
-          // --- FIXED LOGIC: Matching your specific strings ---
-          const isShopLoaded = /Sign In|Register|My Cart|New Releases|Trading Card Game|Plush/i.test(text);
+          // 1. Exact Match Menu Items (Strongest check)
+          const isShopLoaded = /Sign In|Register|My Cart|New Releases|Trading Card Game|Plush|Search/i.test(text);
+          
+          // 2. Fallback Generic Terms (If menu logic fails but site is active)
+          const isGenericPokemonPage = /Pokemon|Nintendo|Game Freak|Center|Home/i.test(text);
+          
+          // 3. Block Logic
           const isAccessDenied = /Access Denied|Just a moment|Cloudflare/i.test(text);
+
+          // 4. Size Check (Key for "Empty" debugging)
+          const isSmallResponse = text.length < 10000;
 
           if (isQueue) {
               const qLen = extractQueueLength(text) || "Unknown";
               handleAlert("Queue Detected!", `In queue. Position: ${qLen}`, currentEmails);
-          } else if (isShopLoaded && !isAccessDenied) {
-              // SUCCESS CASE
+          } 
+          else if (isShopLoaded && !isAccessDenied) {
+              // SUCCESS: Standard menu items found
               handleAlert("Shop Accessible!", "Menu/Shop navigation detected.", currentEmails);
-          } else if (isAccessDenied) {
+          } 
+          else if (isGenericPokemonPage && !isAccessDenied) {
+              // SUCCESS: Fallback found (Site is up, just maybe main content hidden)
+              handleAlert("Shop Accessible (Generic)", "Generic Pokemon/Nintendo footer detected.", currentEmails);
+          }
+          else if (isAccessDenied) {
               statusText.textContent = "Bot Blocked";
               statusDetails.textContent = "PokemonCenter is blocking the proxy (Cloudflare).";
-          } else {
-              statusText.textContent = "Site Reachable (Empty)";
+              statusText.className = 'font-semibold status-neon-red';
+          } 
+          else if (isSmallResponse) {
+              // This catches your "4640" byte issue specifically
+              statusText.textContent = "Proxy Soft-Blocked";
+              statusText.className = 'font-semibold status-neon-yellow';
+              statusDetails.textContent = `Response too small (${text.length} bytes). Likely a captcha/challenge page without text.`;
+          }
+          else {
+              statusText.textContent = "Site Reachable (Unknown Content)";
               statusText.className = 'font-semibold text-white-glow';
               statusDetails.textContent = `Checked. No queue, but content mismatch. Size: ${text.length}`;
           }
