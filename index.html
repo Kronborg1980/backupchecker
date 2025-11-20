@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kronborg's Ultimate Pokémon Checker v2.4</title>
+  <title>Kronborg's Ultimate Pokémon Checker v2.5</title>
   <style>
     /* Tailwind-like utility classes adapted for TRON theme */
     .bg-black { background-color: #000000; }
@@ -338,7 +338,11 @@
     async function sendDiscordMessage(status, details) {
       if (!discordNotificationsEnabled || !discordWebhookUrl) return;
       
-      const isAccessible = status.includes('accessible') || status.includes('active');
+      const isAccessible = status.includes('Accessible');
+      // If accessible, we don't want to spam alerts, so we exit early unless forced (test)
+      // But wait, the logic to prevent alert is in handleAlert now. 
+      // If we are here, we WANT to send.
+      
       const color = isAccessible ? 3066993 : 15158332; 
       
       const payload = {
@@ -358,12 +362,6 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        
-        if (isAccessible) {
-            discordNotificationsEnabled = false;
-            discordToggleButton.classList.replace('active', 'inactive');
-            discordToggleButton.textContent = 'Activate Discord Alerts';
-        }
       } catch (error) {
         console.error('Discord Error:', error);
       }
@@ -383,10 +381,8 @@
         });
       });
 
-      emailNotificationsEnabled = false;
-      emailToggleButton.classList.replace('active', 'inactive');
-      emailToggleButton.textContent = 'Activate Email Alerts';
-      showEmailFeedback('📧 Alerts sent! Notifications paused.');
+      // We don't turn off email for Queue alerts, only for success to avoid spam.
+      // But here we leave it open because this function is now only called for IMPORTANT alerts.
     }
 
     function testEmail() {
@@ -461,17 +457,9 @@
 
           // DETECTION LOGIC
           const isQueue = /queue-it|waiting room/i.test(text) || /queue/i.test(finalUrl);
-          
-          // 1. Exact Match Menu Items (Strongest check)
           const isShopLoaded = /Sign In|Register|My Cart|New Releases|Trading Card Game|Plush|Search/i.test(text);
-          
-          // 2. Fallback Generic Terms (If menu logic fails but site is active)
           const isGenericPokemonPage = /Pokemon|Nintendo|Game Freak|Center|Home/i.test(text);
-          
-          // 3. Block Logic
           const isAccessDenied = /Access Denied|Just a moment|Cloudflare/i.test(text);
-
-          // 4. Size Check (Key for "Empty" debugging)
           const isSmallResponse = text.length < 10000;
 
           if (isQueue) {
@@ -479,23 +467,19 @@
               handleAlert("Queue Detected!", `In queue. Position: ${qLen}`, currentEmails);
           } 
           else if (isShopLoaded && !isAccessDenied) {
-              // SUCCESS: Standard menu items found
               handleAlert("Shop Accessible!", "Menu/Shop navigation detected.", currentEmails);
           } 
           else if (isGenericPokemonPage && !isAccessDenied) {
-              // SUCCESS: Fallback found (Site is up, just maybe main content hidden)
               handleAlert("Shop Accessible (Generic)", "Generic Pokemon/Nintendo footer detected.", currentEmails);
           }
           else if (isAccessDenied) {
-              statusText.textContent = "Bot Blocked";
-              statusDetails.textContent = "PokemonCenter is blocking the proxy (Cloudflare).";
-              statusText.className = 'font-semibold status-neon-red';
+              handleAlert("Bot Blocked", "PokemonCenter is blocking the proxy (Cloudflare).", currentEmails);
           } 
           else if (isSmallResponse) {
-              // This catches your "4640" byte issue specifically
               statusText.textContent = "Proxy Soft-Blocked";
               statusText.className = 'font-semibold status-neon-yellow';
-              statusDetails.textContent = `Response too small (${text.length} bytes). Likely a captcha/challenge page without text.`;
+              statusDetails.textContent = `Response too small (${text.length} bytes). Captcha/Challenge page.`;
+              // No Alert for soft block to avoid spam
           }
           else {
               statusText.textContent = "Site Reachable (Unknown Content)";
@@ -511,11 +495,30 @@
 
     function handleAlert(status, details, emails) {
         const prevStatus = statusText.dataset.previousStatus;
+        
+        // 1. Update Visuals Only
         statusText.textContent = status;
-        statusText.className = 'font-semibold status-neon-green';
         statusDetails.textContent = details;
         statusText.dataset.previousStatus = status;
 
+        // Styling
+        if (status.includes("Accessible")) {
+            statusText.className = 'font-semibold status-neon-green';
+        } else if (status.includes("Queue")) {
+            statusText.className = 'font-semibold text-neon-red'; // Queue is RED/Important
+        } else if (status.includes("Blocked")) {
+            statusText.className = 'font-semibold status-neon-red';
+        } else {
+            statusText.className = 'font-semibold text-white-glow';
+        }
+
+        // 2. Notification Logic
+        // SKIP notification if status is "Shop Accessible"
+        if (status.includes("Accessible")) {
+            return; 
+        }
+
+        // For other statuses (Queue, Blocked), alert if it changed
         if (prevStatus !== status) {
             playThreeBeeps();
             sendEmail(status, details, emails);
