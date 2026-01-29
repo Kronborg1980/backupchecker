@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KRONBORG: CRYSTAL ORACLE v10.0</title>
+  <title>KRONBORG: UNBREAKABLE v10.1</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Orbitron:wght@500;700&display=swap');
 
@@ -34,7 +34,6 @@
       color: var(--text-bright);
     }
     
-    /* Background Drift */
     body::before {
         content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
         background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.005' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)' opacity='0.04'/%3E%3C/svg%3E");
@@ -104,7 +103,6 @@
     .radar-ring.safe .magikarp { transform: scale(1.1); filter: drop-shadow(0 0 5px var(--neon-green)); }
     @keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0); } }
 
-    /* Text Info */
     .status-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
     .lbl-main { font-size: 12px; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 2px; }
     
@@ -124,7 +122,7 @@
     }
     .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color: #fff; font-size: 14px; font-weight: 500; }
 
-    /* Inputs */
+    /* Inputs Fixed */
     .capsule {
       display: flex; align-items: center;
       background: rgba(0,0,0,0.3); border-radius: 50px;
@@ -133,7 +131,17 @@
     }
     .capsule:focus-within { border-color: var(--neon-cyan); background: rgba(0,0,0,0.5); }
     .c-icon { margin-right: 10px; color: var(--text-dim); font-size: 12px; }
-    input[type="text"] { flex: 1; background: none; border: none; color: #fff; font-family: 'Outfit'; font-size: 14px; }
+    
+    input[type="text"], input[type="email"], input[type="url"] { 
+      flex: 1; 
+      background: transparent !important; /* FIXED: FORCE TRANSPARENT */
+      border: none; 
+      color: #fff !important; /* FIXED: FORCE WHITE TEXT */
+      font-family: 'Outfit'; 
+      font-size: 14px; 
+    }
+    input::placeholder { color: #555; }
+
     .btn-del { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.1); border:none; color:#fff; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
     .btn-del:hover { background: var(--neon-pink); }
     
@@ -178,7 +186,7 @@
     <div class="header">
       <div class="title-block">
         <h1>KRONBORG</h1>
-        <span>CRYSTAL ORACLE v10.0</span>
+        <span>UNBREAKABLE v10.1</span>
       </div>
       <div class="cubone-orb" title="System Guardian"></div>
     </div>
@@ -217,6 +225,15 @@
     </div>
 
     <div class="glass-card" style="padding: 15px 25px;">
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+        <div>
+          <span style="display:block; font-size:14px; color:#fff;">Direct Mode (No Proxy)</span>
+          <span style="font-size:10px; color:var(--text-dim);">Enable if you have a CORS Extension</span>
+        </div>
+        <input type="checkbox" class="toggle" id="directModeToggle" onchange="save()">
+      </div>
+
       <div class="card-head" style="margin-bottom: 5px;">
         <span>Scan Interval</span>
         <span style="color:var(--neon-cyan); font-family:'Orbitron'" id="freqVal">10m</span>
@@ -276,13 +293,15 @@
         const d = {
             es: Array.from(g('emailList').querySelectorAll('input')).map(i=>i.value),
             ws: Array.from(g('discordList').querySelectorAll('input')).map(i=>i.value),
-            eo: g('emailToggle').checked, do: g('discordToggle').checked, fr: g('freqSlider').value
-        }; localStorage.setItem('k10_cfg', JSON.stringify(d));
+            eo: g('emailToggle').checked, do: g('discordToggle').checked, fr: g('freqSlider').value,
+            dm: g('directModeToggle').checked
+        }; localStorage.setItem('k10_1_cfg', JSON.stringify(d));
     }
     function load(){
-        const d = JSON.parse(localStorage.getItem('k10_cfg')); if(!d)return;
+        const d = JSON.parse(localStorage.getItem('k10_1_cfg')); if(!d)return;
         d.es.forEach(e=>addEmail(e)); d.ws.forEach(w=>addDiscord(w));
-        g('emailToggle').checked=d.eo; g('discordToggle').checked=d.do; g('freqSlider').value=d.fr; updFreq(d.fr);
+        g('emailToggle').checked=d.eo; g('discordToggle').checked=d.do; g('freqSlider').value=d.fr; 
+        g('directModeToggle').checked=d.dm; updFreq(d.fr);
     }
 
     function toggleSys(on) {
@@ -305,19 +324,30 @@
         if(!run) return;
 
         // 1. Update Status to Scanning
-        setStatus("SCANNING...", "var(--neon-cyan)", "Pinging target via proxies...", "scanning");
+        const direct = g('directModeToggle').checked;
+        setStatus("SCANNING...", "var(--neon-cyan)", direct ? "Direct connection..." : "Rotating proxies...", "scanning");
         g('nextScanTimer').innerText = "Scanning now...";
         
         // 2. Perform Check
         const ts = Date.now();
         const enc = encodeURIComponent(C.t + `?z=${ts}`);
-        const proxies = [`https://api.allorigins.win/raw?url=${enc}`, `https://corsproxy.io/?${enc}`];
         
+        // Expanded Proxy List (Public proxies are unstable, we try many)
+        let proxies = [
+            `https://api.allorigins.win/raw?url=${enc}`,
+            `https://corsproxy.io/?${enc}`,
+            `https://api.codetabs.com/v1/proxy?quest=${enc}`,
+            `https://thingproxy.freeboard.io/fetch/${enc}`
+        ];
+
+        // If Direct Mode, override proxy list with direct URL
+        if(direct) proxies = [C.t + `?z=${ts}`];
+
         let html = "", url = "";
         
         for(const p of proxies) {
             try {
-                const c = new AbortController(); setTimeout(()=>c.abort(), 10000);
+                const c = new AbortController(); setTimeout(()=>c.abort(), 12000); // 12s timeout
                 const r = await fetch(p, {signal:c.signal});
                 if(r.ok) {
                     html = (await r.text()).toLowerCase();
@@ -329,18 +359,20 @@
 
         // 3. Analyze & Update Status
         if(!html) {
-            setStatus("NET ERROR", "var(--neon-pink)", "Proxies failed. Retrying.", "danger");
-            log("Connection failed.", "c-red");
+            setStatus("NET ERROR", "var(--neon-pink)", "All proxies failed. Retrying in 5s...", "danger");
+            log("Connection failed (All Proxies).", "c-red");
+            // Fast Retry Logic
+            scanT = setTimeout(loop, 5000);
+            return; 
         } else {
             analyze(html, url);
         }
 
-        // 4. Schedule Next
+        // 4. Schedule Next Normal Scan
         const mins = parseInt(g('freqSlider').value);
-        const delay = (mins * 60000) + Math.floor(Math.random() * 60000); // 0-60s jitter
+        const delay = (mins * 60000) + Math.floor(Math.random() * 30000);
         nextScanTime = Date.now() + delay;
         
-        // Start Countdown UI
         clearInterval(countT);
         countT = setInterval(() => {
             const left = Math.max(0, Math.ceil((nextScanTime - Date.now()) / 1000));
