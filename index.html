@@ -3,455 +3,506 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kronborg's Stealth Checker v3.0 (2026 Edition)</title>
+  <title>KRONBORG COMMAND CENTER v4.0</title>
   <style>
-    /* TRON / CYBERPUNK THEME - v3.0 */
-    .bg-black { background-color: #050505; }
-    .text-neon-cyan { color: #00f3ff; }
-    .text-neon-red { color: #ff003c; }
-    .text-neon-green { color: #0aff48; }
-    .text-neon-yellow { color: #fcee0a; }
-    .text-white-glow { color: #ffffff; text-shadow: 0 0 8px rgba(255, 255, 255, 0.5); }
-    
+    :root {
+      --bg-dark: #050505;
+      --glass-panel: rgba(20, 20, 25, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --primary: #00f3ff;
+      --accent: #7000ff;
+      --success: #00ff9d;
+      --danger: #ff0055;
+      --text-main: #ffffff;
+      --text-muted: #8b9bb4;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(112, 0, 255, 0.15), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(0, 243, 255, 0.15), transparent 25%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    /* Grid Layout */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .dashboard { grid-template-columns: 1fr; }
+    }
+
+    /* Card Styling */
+    .card {
+      background: var(--glass-panel);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .full-width { grid-column: 1 / -1; }
+
+    /* Typography */
+    h1 {
       font-family: 'Orbitron', monospace;
-      background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #000000 100%);
-      color: #00f3ff;
+      font-size: 1.5rem;
+      margin: 0 0 5px 0;
+      background: linear-gradient(90deg, var(--primary), #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+    }
+    
+    h2 { font-size: 1rem; color: var(--text-muted); margin: 0 0 15px 0; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; }
+
+    /* Inputs & Lists */
+    .input-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 200px;
       overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: #00f3ff #000000;
-    }
-
-    /* Grid Animation */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; width: 200%; height: 200%;
-      background: 
-        linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px);
-      background-size: 40px 40px;
-      transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
-      animation: gridScroll 20s linear infinite;
-      z-index: -1;
-      pointer-events: none;
-    }
-    @keyframes gridScroll {
-      0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); }
-      100% { transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(-200px); }
-    }
-
-    .glass-panel {
-      background: rgba(10, 10, 10, 0.85);
-      border: 1px solid rgba(0, 243, 255, 0.3);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
-      border-radius: 12px;
-      padding: 1.5rem;
-      max-width: 500px;
-      width: 95%;
-      margin: 2rem auto;
-      position: relative;
-    }
-
-    h1 { text-shadow: 0 0 10px #00f3ff; text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 0.5rem; }
-    .sub-text { text-align: center; color: #8899a6; font-size: 0.8rem; margin-bottom: 1.5rem; }
-
-    input, button, select {
-      font-family: 'Orbitron', monospace;
-      outline: none;
-    }
-
-    input[type="email"], input[type="url"] {
-      width: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid #00f3ff;
-      color: #fff;
-      padding: 10px;
-      border-radius: 4px;
-      transition: 0.3s;
-    }
-    input:focus { box-shadow: 0 0 15px rgba(0, 243, 255, 0.4); }
-
-    button {
-      cursor: pointer;
-      font-weight: bold;
-      text-transform: uppercase;
-      transition: all 0.2s;
+      padding-right: 5px;
+      margin-bottom: 10px;
     }
     
-    .btn-main {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #00f3ff;
-      background: rgba(0, 243, 255, 0.1);
-      color: #00f3ff;
-      margin-top: 10px;
-      border-radius: 4px;
-    }
-    .btn-main:hover { background: rgba(0, 243, 255, 0.3); box-shadow: 0 0 15px #00f3ff; }
+    /* Scrollbar styling */
+    .input-list::-webkit-scrollbar { width: 6px; }
+    .input-list::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 3px; }
 
-    .btn-stop {
-      border-color: #ff003c;
-      color: #ff003c;
-      background: rgba(255, 0, 60, 0.1);
+    .input-row { display: flex; gap: 8px; animation: slideIn 0.3s ease; }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .btn-stop:hover { background: rgba(255, 0, 60, 0.3); box-shadow: 0 0 15px #ff003c; }
 
-    .btn-secondary {
-      padding: 5px 10px;
-      border: 1px solid #0aff48;
-      color: #0aff48;
-      background: transparent;
-      border-radius: 4px;
-      font-size: 0.8rem;
-    }
-    .btn-secondary:hover { background: rgba(10, 255, 72, 0.2); }
-
-    .status-panel {
-      background: rgba(0,0,0,0.5);
-      border: 1px solid #333;
-      padding: 15px;
+    input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--glass-border);
+      color: var(--primary);
+      padding: 10px 14px;
       border-radius: 8px;
-      margin-top: 20px;
-      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      transition: 0.2s;
     }
-    
-    .hidden { display: none; }
-    .flex { display: flex; align-items: center; gap: 10px; }
-    .mb-2 { margin-bottom: 10px; }
-    .mt-2 { margin-top: 10px; }
-    
-    /* Range Slider */
-    input[type=range] { width: 100%; accent-color: #00f3ff; }
+    input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
 
-    /* Animations */
-    @keyframes pulse-red { 0% { text-shadow: 0 0 5px #ff003c; } 100% { text-shadow: 0 0 20px #ff003c; } }
-    .alert-active { animation: pulse-red 1s infinite alternate; }
-
-    /* Webhook Special */
-    .pokezonan-btn {
-      background: linear-gradient(90deg, #ff003c, #00f3ff);
+    /* Buttons */
+    button {
       border: none;
-      color: white;
-      padding: 8px;
-      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      transition: 0.2s;
+      border-radius: 8px;
     }
+
+    .btn-icon {
+      width: 38px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+    .btn-icon:hover { background: rgba(255, 0, 85, 0.2); color: var(--danger); }
+
+    .btn-add {
+      background: rgba(0, 243, 255, 0.1);
+      color: var(--primary);
+      width: 100%;
+      padding: 10px;
+      font-size: 0.8rem;
+      border: 1px dashed rgba(0, 243, 255, 0.3);
+    }
+    .btn-add:hover { background: rgba(0, 243, 255, 0.2); border-style: solid; }
+
+    .btn-action {
+      padding: 16px;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .start { background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(0, 243, 255, 0.05)); border: 1px solid var(--primary); color: var(--primary); box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
+    .start:hover { box-shadow: 0 0 25px rgba(0, 243, 255, 0.4); transform: translateY(-2px); }
+
+    .stop { background: rgba(255, 0, 85, 0.1); border: 1px solid var(--danger); color: var(--danger); }
+    .stop:hover { background: rgba(255, 0, 85, 0.2); box-shadow: 0 0 15px rgba(255, 0, 85, 0.4); }
+
+    .test { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); padding: 8px 16px; font-size: 0.8rem; }
+    .test:hover { border-color: var(--text-main); color: var(--text-main); }
+
+    /* Slider */
+    .slider-container { margin-top: 15px; }
+    input[type=range] { width: 100%; accent-color: var(--primary); }
+
+    /* Terminal */
+    .terminal {
+      background: #000;
+      border-radius: 8px;
+      padding: 15px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: #aaa;
+      height: 150px;
+      overflow-y: auto;
+      border: 1px solid #333;
+    }
+    .log-time { color: #555; margin-right: 8px; }
+    .log-info { color: var(--primary); }
+    .log-success { color: var(--success); }
+    .log-error { color: var(--danger); }
+    .log-warn { color: #ffae00; }
+
+    /* Status Badge */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-left: 10px;
+      background: #333;
+      color: #777;
+    }
+    .status-badge.active { background: rgba(0, 255, 157, 0.2); color: var(--success); box-shadow: 0 0 10px rgba(0, 255, 157, 0.2); }
+    
+    .hidden { display: none !important; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
 </head>
-<body class="bg-black">
+<body>
 
-  <div class="glass-panel">
-    <h1>Kronborg's Checker v3.0</h1>
-    <p class="sub-text">Stealth Mode: ENABLED. Target: TCG Category</p>
+  <div class="dashboard">
+    
+    <div class="card full-width flex-between">
+      <div>
+        <h1>KRONBORG COMMAND v4.0</h1>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Target: Pokémon Center TCG</div>
+      </div>
+      <div class="flex-between" style="gap:10px">
+         <div id="sysStatus" class="status-badge">SYSTEM OFFLINE</div>
+         <div id="runTimer" style="font-family: 'JetBrains Mono'; font-size: 0.9rem;">00:00:00</div>
+      </div>
+    </div>
 
-    <div id="setupArea">
+    <div class="card">
+      <div class="flex-between">
+        <h2>Email Alerts</h2>
+        <button class="test" onclick="testEmails()">Test Email</button>
+      </div>
+      <div id="emailList" class="input-list">
+        </div>
+      <button class="btn-add" onclick="addEmailRow()">+ Add Email Recipient</button>
+    </div>
+
+    <div class="card">
+      <div class="flex-between">
+        <h2>Discord Webhooks</h2>
+        <button class="test" onclick="testWebhooks()">Test Discord</button>
+      </div>
+      <div id="webhookList" class="input-list">
+        </div>
+      <button class="btn-add" onclick="addWebhookRow()">+ Add Webhook URL</button>
+      <div style="margin-top: 5px; font-size: 0.7rem; color: #555; cursor: pointer; text-align:center" onclick="addPokezonanPreset()">
+        Load "Pokezonan" Preset
+      </div>
+    </div>
+
+    <div class="card full-width">
+      <h2>Scan Controls</h2>
       
-      <div class="mb-2">
-        <label class="text-neon-cyan text-sm">Alert Emails:</label>
-        <div id="emailContainer">
-          <div class="flex mb-2">
-            <input type="email" class="email-input" placeholder="you@example.com">
-          </div>
+      <div class="slider-container">
+        <div class="flex-between" style="margin-bottom: 5px;">
+          <span style="font-size: 0.8rem;">Scan Interval</span>
+          <span id="freqDisplay" style="color: var(--primary); font-weight: bold;">10 min</span>
         </div>
-        <button onclick="addEmailField()" class="btn-secondary" style="width:100%">+ Add Email</button>
-      </div>
-
-      <div class="mb-2 mt-2">
-        <label class="text-neon-cyan text-sm">Discord Webhook:</label>
-        <div class="flex">
-          <input type="url" id="webhookInput" placeholder="https://discord.com/api/webhooks/...">
-          <button onclick="fillPokezonan()" class="pokezonan-btn" title="Auto-fill Pokezonan">⚡</button>
+        <input type="range" id="freqSlider" min="1" max="60" value="10" oninput="updateFreq(this.value)">
+        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 5px;">
+          *Includes "Human Jitter" (±60s randomization) to prevent detection.
         </div>
       </div>
 
-      <div class="mt-2">
-        <label class="text-neon-cyan text-sm">
-           Check Frequency: <span id="freqLabel" class="text-white-glow">10</span> min (+ Random Jitter)
-        </label>
-        <input type="range" id="freqSlider" min="2" max="60" value="10" oninput="updateFreq(this.value)">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+        <button id="btnStart" class="btn-action start" onclick="toggleSystem(true)">INITIALIZE SCAN</button>
+        <button id="btnStop" class="btn-action stop hidden" onclick="toggleSystem(false)">ABORT SEQUENCE</button>
       </div>
-
-      <div class="flex mt-2" style="justify-content: space-between;">
-        <button id="toggleEmail" class="btn-secondary" onclick="toggleAlerts('email')">Email: ON</button>
-        <button id="toggleDiscord" class="btn-secondary" onclick="toggleAlerts('discord')">Discord: ON</button>
-        <button class="btn-secondary" style="border-color:#fcee0a; color:#fcee0a" onclick="testAlerts()">TEST</button>
-      </div>
-
     </div>
 
-    <div class="status-panel">
-      <div style="font-size: 0.8rem; color: #666;">CURRENT STATUS</div>
-      <div id="mainStatus" class="text-2xl font-bold text-white-glow" style="margin: 10px 0;">IDLE</div>
-      <div id="detailStatus" class="text-sm text-neon-cyan">Waiting to start...</div>
-      <div class="mt-2 text-xs text-gray-400">
-        Run Time: <span id="timer">00:00:00</span> | Checks: <span id="checkCount">0</span>
+    <div class="card full-width">
+      <h2>Live System Log</h2>
+      <div id="terminal" class="terminal">
+        <div class="log-line"><span class="log-time">--:--:--</span>System initialized. Waiting for input...</div>
       </div>
-      <div id="stealthIndicator" class="mt-2 text-xs text-neon-green hidden">👁️ Stealth Proxies Active</div>
     </div>
-
-    <button id="btnStart" class="btn-main" onclick="startSystem()">INITIALIZE SYSTEM</button>
-    <button id="btnStop" class="btn-main btn-stop hidden" onclick="stopSystem()">TERMINATE</button>
 
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
-
   <script>
-    // --- CONFIGURATION ---
-    const EMAILJS_KEY = "8w7eu6mrg3lRl6ta3"; // Your key
+    // --- SETUP ---
     const TARGET_URL = "https://www.pokemoncenter.com/category/trading-card-game";
+    const EMAILJS_KEY = "8w7eu6mrg3lRl6ta3"; 
     
     // State
     let isRunning = false;
-    let checkInterval = null;
-    let timeInterval = null;
+    let scanTimer = null;
+    let clockTimer = null;
     let startTime = 0;
-    let checksPerformed = 0;
-    let settings = {
-      email: true,
-      discord: true,
-      baseMinutes: 10
-    };
+    
+    // Init EmailJS
+    if(window.emailjs) emailjs.init({ publicKey: EMAILJS_KEY });
 
-    // Initialize EmailJS
-    (function(){
-      if(window.emailjs) emailjs.init({ publicKey: EMAILJS_KEY });
-    })();
+    // --- DOM ELEMENTS ---
+    const emailList = document.getElementById('emailList');
+    const webhookList = document.getElementById('webhookList');
+    const terminal = document.getElementById('terminal');
+    const sysStatus = document.getElementById('sysStatus');
+
+    // --- INITIALIZATION (Load Saved Data) ---
+    window.onload = function() {
+        loadSettings();
+        if(emailList.children.length === 0) addEmailRow(); // Empty slot
+        if(webhookList.children.length === 0) addWebhookRow(); // Empty slot
+    }
 
     // --- UI FUNCTIONS ---
+
+    function createRow(value = '', placeholder, type) {
+        const div = document.createElement('div');
+        div.className = 'input-row';
+        div.innerHTML = `
+            <input type="${type}" value="${value}" placeholder="${placeholder}" onchange="saveSettings()">
+            <button class="btn-icon" onclick="this.parentElement.remove(); saveSettings();">&times;</button>
+        `;
+        return div;
+    }
+
+    function addEmailRow(val = '') {
+        emailList.appendChild(createRow(val, 'name@example.com', 'email'));
+    }
+
+    function addWebhookRow(val = '') {
+        webhookList.appendChild(createRow(val, 'https://discord.com/api/webhooks/...', 'url'));
+    }
+
+    function addPokezonanPreset() {
+        addWebhookRow("https://discord.com/api/webhooks/1418654823745716436/vuMKu1s095Cq3BfU06OF_Z_mwxG39zHppHJ3c4BX5X38WuJFWPGhIZdopWTEEXlophiN");
+        saveSettings();
+        log("Preset: Pokezonan webhook added.", "info");
+    }
+
     function updateFreq(val) {
-      document.getElementById('freqLabel').innerText = val;
-      settings.baseMinutes = parseInt(val);
+        document.getElementById('freqDisplay').innerText = val + " min";
     }
 
-    function addEmailField() {
-      const div = document.createElement('div');
-      div.className = 'flex mb-2';
-      div.innerHTML = `<input type="email" class="email-input" placeholder="another@example.com"><button class="btn-secondary" style="border-color:#ff003c; color:#ff003c" onclick="this.parentElement.remove()">X</button>`;
-      document.getElementById('emailContainer').appendChild(div);
+    function log(msg, type = "info") {
+        const now = new Date().toLocaleTimeString();
+        const line = document.createElement('div');
+        line.innerHTML = `<span class="log-time">${now}</span><span class="log-${type}">${msg}</span>`;
+        terminal.prepend(line);
+        // Keep log clean
+        if (terminal.children.length > 50) terminal.lastChild.remove();
     }
 
-    function fillPokezonan() {
-      document.getElementById('webhookInput').value = "https://discord.com/api/webhooks/1418654823745716436/vuMKu1s095Cq3BfU06OF_Z_mwxG39zHppHJ3c4BX5X38WuJFWPGhIZdopWTEEXlophiN";
-      alert("Pokezonan Secured.");
+    // --- SAVE/LOAD SYSTEM ---
+    
+    function saveSettings() {
+        const emails = Array.from(emailList.querySelectorAll('input')).map(i => i.value);
+        const webhooks = Array.from(webhookList.querySelectorAll('input')).map(i => i.value);
+        localStorage.setItem('kronborg_emails', JSON.stringify(emails));
+        localStorage.setItem('kronborg_webhooks', JSON.stringify(webhooks));
     }
 
-    function toggleAlerts(type) {
-      settings[type] = !settings[type];
-      const btn = document.getElementById(type === 'email' ? 'toggleEmail' : 'toggleDiscord');
-      btn.innerText = `${type.charAt(0).toUpperCase() + type.slice(1)}: ${settings[type] ? 'ON' : 'OFF'}`;
-      btn.style.opacity = settings[type] ? '1' : '0.5';
-    }
-
-    // --- LOGIC CORE ---
-
-    function getProxifiedUrls(target) {
-        // Advanced 2026 Proxy Rotation
-        // We attach random query params to avoid caching
-        const timestamp = Date.now();
-        const rand = Math.floor(Math.random() * 100000);
+    function loadSettings() {
+        const emails = JSON.parse(localStorage.getItem('kronborg_emails') || '[]');
+        const webhooks = JSON.parse(localStorage.getItem('kronborg_webhooks') || '[]');
         
-        // Encode the target URL
-        const cleanTarget = encodeURIComponent(target + `?cb=${timestamp}`);
-
-        return [
-            `https://api.allorigins.win/raw?url=${cleanTarget}`,
-            `https://corsproxy.io/?${cleanTarget}`,
-            `https://thingproxy.freeboard.io/fetch/${target}?cb=${timestamp}` // Backup
-        ];
+        emails.forEach(e => { if(e) addEmailRow(e) });
+        webhooks.forEach(w => { if(w) addWebhookRow(w) });
     }
 
+    // --- CORE LOGIC ---
+
+    function toggleSystem(state) {
+        isRunning = state;
+        const btnStart = document.getElementById('btnStart');
+        const btnStop = document.getElementById('btnStop');
+
+        if (isRunning) {
+            btnStart.classList.add('hidden');
+            btnStop.classList.remove('hidden');
+            sysStatus.innerText = "SYSTEM ACTIVE";
+            sysStatus.classList.add('active');
+            startTime = Date.now();
+            
+            log("Sequence started. Initializing proxy chain...", "info");
+            
+            // Start Clock
+            clockTimer = setInterval(() => {
+                const diff = Date.now() - startTime;
+                const d = new Date(diff);
+                document.getElementById('runTimer').innerText = d.toISOString().substr(11, 8);
+            }, 1000);
+
+            runCheckLoop();
+        } else {
+            btnStart.classList.remove('hidden');
+            btnStop.classList.add('hidden');
+            sysStatus.innerText = "SYSTEM OFFLINE";
+            sysStatus.classList.remove('active');
+            clearTimeout(scanTimer);
+            clearInterval(clockTimer);
+            log("Sequence aborted by user.", "error");
+        }
+    }
+
+    async function runCheckLoop() {
+        if (!isRunning) return;
+
+        await checkShop();
+
+        const baseMins = parseInt(document.getElementById('freqSlider').value);
+        const baseMs = baseMins * 60 * 1000;
+        const jitter = Math.floor(Math.random() * 60000); // 0-60s random
+        const nextTime = baseMs + jitter;
+
+        log(`Sleeping for ${Math.floor(nextTime/1000)}s...`, "info");
+        scanTimer = setTimeout(runCheckLoop, nextTime);
+    }
+
+    // --- CHECKER LOGIC (v3.0 Logic) ---
     async function checkShop() {
-        updateStatus("SCANNING...", "Rotating Proxies...", "text-white-glow");
-        
-        const proxies = getProxifiedUrls(TARGET_URL);
-        let success = false;
-        let htmlContent = "";
+        log("Pinging target via Proxy Rotation...", "info");
+
+        // 1. Setup Proxies
+        const ts = Date.now();
+        const encoded = encodeURIComponent(TARGET_URL + `?cb=${ts}`);
+        const proxies = [
+            `https://api.allorigins.win/raw?url=${encoded}`,
+            `https://corsproxy.io/?${encoded}`
+        ];
+
+        let content = null;
         let finalUrl = "";
 
-        // Try proxies sequentially
+        // 2. Fetch
         for (const proxy of proxies) {
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+                const id = setTimeout(() => controller.abort(), 15000);
+                const res = await fetch(proxy, { signal: controller.signal });
+                clearTimeout(id);
                 
-                const response = await fetch(proxy, {
-                    method: 'GET',
-                    signal: controller.signal
-                });
-                clearTimeout(timeoutId);
-
-                if (response.ok) {
-                    finalUrl = response.url;
-                    htmlContent = await response.text();
-                    success = true;
-                    break; // We got data
+                if (res.ok) {
+                    content = (await res.text()).toLowerCase();
+                    finalUrl = res.url.toLowerCase();
+                    break;
                 }
-            } catch (e) {
-                console.log("Proxy failed, switching...");
-            }
+            } catch (e) {}
         }
 
-        checksPerformed++;
-        document.getElementById('checkCount').innerText = checksPerformed;
-
-        if (!success) {
-            updateStatus("CONNECTION FAILED", "All proxies blocked. Retrying...", "text-neon-red");
+        if (!content) {
+            log("Network Error: Could not reach proxies.", "error");
             return;
         }
 
-        analyzeResponse(htmlContent, finalUrl);
+        // 3. Analyze
+        if (finalUrl.includes("queue-it.net") || content.includes("users in line") || content.includes("queue_id")) {
+            log("CRITICAL: QUEUE DETECTED!", "error");
+            broadcast("QUEUE ACTIVE!", "You are in a queue. Check immediately.");
+            playAlarm();
+        } 
+        else if (content.includes("add to cart") || content.includes("trading card game")) {
+            log("SUCCESS: SHOP ACCESSIBLE!", "success");
+            broadcast("DROP LIVE!", "Shop is open and accessible.");
+            playAlarm();
+        } 
+        else if (content.includes("challenge") || content.includes("cloudflare")) {
+            log("Soft Block (Cloudflare). Retrying next cycle.", "warn");
+        }
+        else {
+            log("Target reachable. No queue found.", "info");
+        }
     }
 
-    function analyzeResponse(html, url) {
-        const lowerHtml = html.toLowerCase();
-        const lowerUrl = url.toLowerCase();
+    // --- BROADCASTING ---
 
-        // --- DETECTION LOGIC v3.0 ---
+    function broadcast(title, msg) {
+        const emails = Array.from(emailList.querySelectorAll('input')).map(i => i.value).filter(v => v.includes('@'));
+        const webhooks = Array.from(webhookList.querySelectorAll('input')).map(i => i.value).filter(v => v.includes('http'));
 
-        // 1. REDIRECT CHECK (Most Accurate)
-        // If the URL contains queue-it.net, we are 100% in a queue
-        if (lowerUrl.includes("queue-it.net") || lowerHtml.includes("queue-it.net")) {
-            triggerAlert("QUEUE DETECTED", "Redirected to Queue-it domain.");
-            updateStatus("IN QUEUE", "Redirect Detected", "text-neon-red alert-active");
-            return;
-        }
+        // Send Discord
+        webhooks.forEach(url => {
+            const color = title.includes("DROP") ? 5763719 : 15548997;
+            fetch(url, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    embeds: [{
+                        title: `🚨 ${title}`,
+                        description: msg,
+                        color: color,
+                        timestamp: new Date().toISOString()
+                    }]
+                })
+            }).catch(e => log("Discord send failed", "error"));
+        });
 
-        // 2. KEYWORD CHECK
-        // "Users in line", "Waiting Room", "queue_id"
-        if (lowerHtml.includes("users in line") || lowerHtml.includes("waiting room") || lowerHtml.includes("queue_id")) {
-             triggerAlert("QUEUE DETECTED", "Queue keywords found in HTML.");
-             updateStatus("IN QUEUE", "Keywords Detected", "text-neon-red alert-active");
-             return;
-        }
-
-        // 3. BLOCK CHECK (Cloudflare/WAF)
-        // "Just a moment", "Challenge", "Verify you are human"
-        if (lowerHtml.includes("just a moment") || lowerHtml.includes("verify you are human") || lowerHtml.includes("cloudflare")) {
-            updateStatus("WAF BLOCKED", "Cloudflare detected proxy. Waiting...", "text-neon-yellow");
-            // Do NOT alert on blocks, it's spammy. Just wait.
-            return;
-        }
-
-        // 4. SUCCESS CHECK
-        // We look for specific shop elements that only appear when unlocked
-        if (lowerHtml.includes("add to cart") || lowerHtml.includes("trading card game") || lowerHtml.includes("my cart")) {
-            triggerAlert("SHOP UNLOCKED!", "Shop navigation is visible and accessible!");
-            updateStatus("ACCESSIBLE", "Shop is OPEN.", "text-neon-green alert-active");
-            return;
-        }
-
-        // 5. AMBIGUOUS
-        updateStatus("ONLINE", "Site reachable. No queue detected.", "text-white-glow");
-    }
-
-    // --- ALERTS ---
-
-    function triggerAlert(title, message) {
-        // Prevent spamming alerts if status hasn't changed? 
-        // For now, we alert every time a positive state is found because it's urgent.
-        
-        playAlarm();
-
-        // Discord
-        if (settings.discord) {
-            const webhook = document.getElementById('webhookInput').value;
-            if (webhook) {
-                const color = title.includes("UNLOCKED") ? 5763719 : 15548997; // Green or Red
-                fetch(webhook, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        embeds: [{
-                            title: `🚨 ${title}`,
-                            description: message,
-                            color: color,
-                            timestamp: new Date().toISOString(),
-                            footer: { text: "Kronborg Check v3.0" }
-                        }]
-                    })
-                }).catch(e => console.error(e));
-            }
-        }
-
-        // Email
-        if (settings.email) {
-            const inputs = document.querySelectorAll('.email-input');
-            const emails = Array.from(inputs).map(i => i.value).filter(v => v.includes('@'));
-            
-            emails.forEach(email => {
-                emailjs.send("service_ahqdaj5", "template_whhvnra", {
-                    status: title,
-                    details: message,
-                    timestamp: new Date().toLocaleString(),
-                    to_email: email
-                });
+        // Send Email
+        emails.forEach(email => {
+            emailjs.send("service_ahqdaj5", "template_whhvnra", {
+                status: title,
+                details: msg,
+                to_email: email
             });
+        });
+    }
+
+    // --- TESTING ---
+    function testEmails() {
+        const count = emailList.querySelectorAll('input[value*="@"]').length;
+        if(count > 0) {
+            broadcast("TEST EMAIL", "If you read this, email alerts are working.");
+            log(`Sent test to ${count} emails.`, "success");
+        } else {
+            alert("Add a valid email first.");
         }
     }
 
-    // --- SYSTEM CONTROL ---
-
-    function startSystem() {
-        const emails = document.querySelectorAll('.email-input');
-        const hasEmail = Array.from(emails).some(e => e.value.includes('@'));
-        const hasWebhook = document.getElementById('webhookInput').value.length > 10;
-
-        if (!hasEmail && !hasWebhook) {
-            alert("Please configure at least one alert method (Email or Discord).");
-            return;
+    function testWebhooks() {
+        const count = webhookList.querySelectorAll('input[value*="http"]').length;
+        if(count > 0) {
+            broadcast("TEST DISCORD", "Webhook connection confirmed.");
+            log(`Sent test to ${count} webhooks.`, "success");
+        } else {
+            alert("Add a valid webhook URL first.");
         }
-
-        isRunning = true;
-        startTime = Date.now();
-        document.getElementById('btnStart').classList.add('hidden');
-        document.getElementById('btnStop').classList.remove('hidden');
-        document.getElementById('stealthIndicator').classList.remove('hidden');
-        
-        // Start Timer
-        timeInterval = setInterval(() => {
-            const diff = Date.now() - startTime;
-            const h = Math.floor(diff / 3600000);
-            const m = Math.floor((diff % 3600000) / 60000);
-            const s = Math.floor((diff % 60000) / 1000);
-            document.getElementById('timer').innerText = `${h}:${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
-        }, 1000);
-
-        runLoop();
-    }
-
-    function stopSystem() {
-        isRunning = false;
-        clearTimeout(checkInterval);
-        clearInterval(timeInterval);
-        document.getElementById('btnStart').classList.remove('hidden');
-        document.getElementById('btnStop').classList.add('hidden');
-        document.getElementById('stealthIndicator').classList.add('hidden');
-        updateStatus("STOPPED", "System Halted", "text-neon-red");
-    }
-
-    function runLoop() {
-        if (!isRunning) return;
-
-        checkShop();
-
-        // Calculate next run with Jitter (Randomness)
-        // Base minutes + Random seconds between 0 and 60
-        const baseMs = settings.baseMinutes * 60 * 1000;
-        const jitter = Math.floor(Math.random() * 60000); 
-        const nextDelay = baseMs + jitter;
-
-        checkInterval = setTimeout(runLoop, nextDelay);
-    }
-
-    function updateStatus(main, detail, cssClass) {
-        const m = document.getElementById('mainStatus');
-        const d = document.getElementById('detailStatus');
-        m.innerText = main;
-        m.className = `text-2xl font-bold ${cssClass}`;
-        d.innerText = detail;
     }
 
     // Audio
@@ -462,18 +513,13 @@
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-        osc.type = 'sawtooth';
+        osc.type = 'square';
         osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.5);
+        osc.frequency.linearRampToValueAtTime(880, audioCtx.currentTime + 0.1);
         gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
         osc.start();
         osc.stop(audioCtx.currentTime + 0.5);
-    }
-
-    function testAlerts() {
-        triggerAlert("TEST FIRED", "This is a test of the Kronborg system.");
-        alert("Test sent!");
     }
   </script>
 </body>
