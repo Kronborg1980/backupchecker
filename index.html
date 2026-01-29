@@ -3,501 +3,570 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KRONBORG COMMAND v5.0</title>
+  <title>KRONBORG: PROTOCOL MAGIKARP</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;700&display=swap');
+
     :root {
-      --bg: #09090b;
-      --card-bg: #18181b;
-      --border: #27272a;
-      --accent: #00e1ff; /* Neon Cyan */
-      --danger: #ff004c;
-      --success: #00ff94;
-      --text: #e4e4e7;
-      --text-dim: #71717a;
+      --bg-dark: #050505;
+      --glass: rgba(20, 20, 35, 0.85);
+      --neon-blue: #00f3ff;
+      --neon-red: #ff0055;
+      --neon-gold: #ffd700;
+      --magikarp-orange: #ff5e00;
+      --cubone-bone: #e3e3d8;
     }
 
-    * { box-sizing: border-box; outline: none; }
+    * { box-sizing: border-box; outline: none; user-select: none; }
 
     body {
       margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg);
-      background-image: radial-gradient(circle at 50% -20%, #221d3b, var(--bg));
-      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+      background-size: 30px 30px;
+      color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      font-size: 14px;
-    }
-
-    /* Main Container */
-    .app-container {
-      width: 100%;
-      max-width: 480px;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
     }
 
-    /* Header */
+    /* Main Chassis */
+    .pokedex-container {
+      width: 100%;
+      max-width: 420px;
+      background: var(--glass);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+      box-shadow: 
+        0 0 40px rgba(0, 243, 255, 0.1),
+        inset 0 0 20px rgba(0, 0, 0, 0.8);
+      position: relative;
+      overflow: hidden;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+
+    /* Decorative Top Bar */
+    .top-bar {
+      height: 6px;
+      background: linear-gradient(90deg, var(--neon-blue), var(--neon-red));
+      width: 100%;
+    }
+
+    /* Header with Cubone */
     .header {
-      padding: 16px 20px;
-      background: rgba(0,0,0,0.3);
-      border-bottom: 1px solid var(--border);
+      padding: 20px 25px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .header h1 {
+
+    .title-group h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 22px;
       margin: 0;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      color: var(--accent);
+      background: linear-gradient(to right, #fff, var(--neon-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       text-transform: uppercase;
+      letter-spacing: 2px;
     }
-    .status-dot {
-      height: 8px; width: 8px;
-      background: #444;
+
+    .cubone-icon {
+      width: 50px;
+      height: 50px;
+      background-image: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/104.png');
+      background-size: cover;
+      filter: drop-shadow(0 0 5px var(--cubone-bone));
+      opacity: 0.8;
+    }
+
+    /* Radar / Magikarp Section */
+    .radar-section {
+      display: flex;
+      justify-content: center;
+      padding: 20px 0;
+      position: relative;
+    }
+
+    .radar-circle {
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
-      box-shadow: 0 0 0 0 rgba(255,255,255,0);
+      border: 2px dashed rgba(255, 255, 255, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      background: radial-gradient(circle, rgba(0, 243, 255, 0.1), transparent);
       transition: 0.3s;
     }
-    .status-dot.active {
-      background: var(--success);
-      box-shadow: 0 0 10px var(--success);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-    /* Content Area */
-    .content { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-
-    /* Control Groups */
-    .control-group {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
+    .radar-circle.active {
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 30px var(--neon-blue);
+      animation: spinBorder 4s linear infinite;
     }
-    
-    .group-header {
+
+    .magikarp {
+      width: 80px;
+      height: 80px;
+      background-image: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/129.png');
+      background-size: cover;
+      image-rendering: pixelated;
+      transition: 0.3s;
+    }
+
+    .radar-circle.active .magikarp {
+      animation: splash 0.5s infinite;
+    }
+
+    @keyframes splash {
+      0% { transform: rotate(0deg) translateY(0); }
+      25% { transform: rotate(-15deg) translateY(-10px); }
+      50% { transform: rotate(0deg) translateY(0); }
+      75% { transform: rotate(15deg) translateY(-5px); }
+      100% { transform: rotate(0deg) translateY(0); }
+    }
+
+    @keyframes spinBorder { 100% { transform: rotate(360deg); } }
+
+    /* Status Text */
+    .status-display {
+      text-align: center;
+      font-family: 'Orbitron', monospace;
+      margin-bottom: 20px;
+    }
+    .status-main { font-size: 14px; letter-spacing: 1px; color: #888; }
+    .status-timer { font-size: 12px; color: var(--neon-blue); margin-top: 5px; opacity: 0; transition: 0.3s; }
+    .status-timer.show { opacity: 1; }
+
+    /* Content Form */
+    .content { padding: 0 25px 25px; }
+
+    /* Panels */
+    .panel {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 12px;
+      border-left: 3px solid rgba(255, 255, 255, 0.1);
+      transition: 0.3s;
+    }
+    .panel:hover { border-left-color: var(--neon-blue); background: rgba(0, 0, 0, 0.6); }
+
+    .panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 5px;
     }
-    .group-label { font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-    
-    /* Toggle Switch */
-    .toggle {
-      position: relative;
-      display: inline-block;
-      width: 36px;
-      height: 20px;
-    }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #333;
-      transition: .4s;
-      border-radius: 20px;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 14px; width: 14px;
-      left: 3px; bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    input:checked + .slider { background-color: var(--accent); }
-    input:checked + .slider:before { transform: translateX(16px); }
+    .panel-title { font-size: 14px; font-weight: 700; color: #ccc; display: flex; align-items: center; gap: 8px; }
 
-    /* Collapsible Input Lists */
-    .input-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    /* Toggles */
+    .toggle-switch {
+      position: relative;
+      width: 40px; height: 20px;
+      appearance: none;
+      background: #333;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 16px; height: 16px;
+      background: #888;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    .toggle-switch:checked { background: var(--magikarp-orange); box-shadow: 0 0 10px var(--magikarp-orange); }
+    .toggle-switch:checked::after { transform: translateX(20px); background: #fff; }
+
+    /* Inputs */
+    .hidden-list {
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.3s ease;
+      transition: max-height 0.4s ease;
     }
-    .input-list.expanded { max-height: 200px; overflow-y: auto; padding-top: 5px; }
+    .hidden-list.open { max-height: 150px; overflow-y: auto; margin-top: 10px; }
     
-    .input-row { display: flex; gap: 6px; }
-    input[type="text"], input[type="email"], input[type="url"] {
-      flex: 1;
-      background: #000;
-      border: 1px solid #333;
-      color: var(--text);
-      padding: 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-family: monospace;
-    }
-    .btn-mini {
-      background: #222; border: 1px solid #333; color: #888;
-      width: 28px; cursor: pointer; border-radius: 4px;
-      display: flex; justify-content: center; align-items: center;
-    }
-    .btn-mini:hover { color: var(--danger); border-color: var(--danger); }
-
-    .expand-btn {
-      background: none; border: none; color: var(--accent);
-      font-size: 11px; cursor: pointer; padding: 0; text-decoration: underline;
-    }
-
-    /* Frequency Slider */
-    .range-container { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
-    input[type=range] { flex: 1; accent-color: var(--accent); height: 4px; }
-    .freq-val { font-family: monospace; color: var(--accent); min-width: 45px; text-align: right; }
-
-    /* Big Buttons */
-    .action-btn {
+    .input-row { display: flex; gap: 5px; margin-bottom: 5px; }
+    
+    input[type="text"] {
       width: 100%;
-      padding: 14px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 13px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: 0.2s;
-      border: none;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--neon-blue);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
     }
-    .btn-start { background: var(--accent); color: #000; box-shadow: 0 0 15px rgba(0, 225, 255, 0.2); }
-    .btn-start:hover { background: #33ffff; box-shadow: 0 0 25px rgba(0, 225, 255, 0.4); }
+    input::placeholder { color: #444; }
+
+    .btn-icon {
+      background: transparent; border: 1px solid #444; color: #666;
+      border-radius: 6px; width: 32px; cursor: pointer;
+    }
+    .btn-icon:hover { color: var(--neon-red); border-color: var(--neon-red); }
+
+    .btn-text {
+      background: none; border: none; color: #666; font-size: 11px;
+      cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+      margin-top: 5px;
+    }
+    .btn-text:hover { color: var(--neon-blue); }
+
+    /* Slider */
+    input[type=range] { width: 100%; height: 4px; background: #333; accent-color: var(--neon-blue); border-radius: 2px; }
+
+    /* Main Button */
+    .power-btn {
+      width: 100%;
+      padding: 18px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 16px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #000;
+      background: var(--neon-blue);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+      transition: 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .power-btn:hover { transform: scale(1.02); box-shadow: 0 0 40px rgba(0, 243, 255, 0.6); }
     
-    .btn-stop { background: var(--danger); color: #fff; display: none; }
-    .btn-stop:hover { background: #ff3370; box-shadow: 0 0 15px rgba(255, 0, 76, 0.4); }
+    .power-btn.stop { background: var(--neon-red); box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); color: #fff; }
 
     /* Terminal */
-    .terminal {
+    .terminal-window {
+      margin-top: 15px;
+      height: 100px;
       background: #000;
-      padding: 15px;
-      height: 120px;
-      border-top: 1px solid var(--border);
-      font-family: 'Courier New', monospace;
+      border: 1px solid #222;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: monospace;
       font-size: 11px;
-      color: #666;
+      color: #555;
       overflow-y: auto;
       display: flex;
-      flex-direction: column-reverse; /* New logs at bottom visually, but structure wise we append */
+      flex-direction: column-reverse;
     }
-    .log-entry { margin-bottom: 4px; }
-    .log-time { color: #444; margin-right: 6px; }
-    .c-info { color: var(--accent); }
-    .c-err { color: var(--danger); }
-    .c-success { color: var(--success); }
+    .log-entry { margin-bottom: 2px; }
+    .c-success { color: var(--neon-blue); }
+    .c-err { color: var(--neon-red); }
+    .c-warn { color: var(--magikarp-orange); }
 
   </style>
 </head>
 <body>
 
-  <div class="app-container">
+<div class="pokedex-container">
+  <div class="top-bar"></div>
+  
+  <div class="header">
+    <div class="title-group">
+      <h1>Kronborg</h1>
+      <div style="font-size: 10px; color: #666; letter-spacing: 1px;">TCG CHECKER v6.0</div>
+    </div>
+    <div class="cubone-icon" title="Guardian Cubone"></div>
+  </div>
+
+  <div class="radar-section">
+    <div class="radar-circle" id="radar">
+      <div class="magikarp"></div>
+    </div>
+  </div>
+
+  <div class="status-display">
+    <div id="statusText" class="status-main">SYSTEM IDLE</div>
+    <div id="timerDisplay" class="status-timer">RUNTIME: 00:00:00</div>
+  </div>
+
+  <div class="content">
     
-    <div class="header">
-      <div>
-        <h1>Kronborg v5.0</h1>
-        <div style="font-size: 10px; color: var(--text-dim);">TCG Stealth Scanner</div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">📡 ALERTS</span>
       </div>
-      <div style="text-align: right;">
-        <div class="status-dot" id="statusDot"></div>
-        <div id="runTime" style="font-size: 10px; font-family: monospace; margin-top: 4px; color: var(--text-dim);">00:00:00</div>
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-size:12px; color:#888;">EMAIL</span>
+        <input type="checkbox" class="toggle-switch" id="toggleEmail" checked>
+      </div>
+      <div class="hidden-list" id="emailList">
+        </div>
+      <button class="btn-text" onclick="addEmailRow()">+ Add Email</button>
+      <button class="btn-text" style="float:right" onclick="toggleView('emailList')">Edit List</button>
+
+      <div style="height:1px; background:#333; margin:10px 0;"></div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-size:12px; color:#888;">DISCORD</span>
+        <input type="checkbox" class="toggle-switch" id="toggleDiscord" checked>
+      </div>
+      <div class="hidden-list" id="discordList">
+        </div>
+      <button class="btn-text" onclick="addWebhookRow()">+ Add Webhook</button>
+      <button class="btn-text" style="float:right" onclick="toggleView('discordList')">Edit List</button>
+      <div style="text-align:center; margin-top:5px;">
+        <button class="btn-text" style="color:var(--neon-blue)" onclick="addPokezonan()">⚡ LOAD POKEZONAN PRESET</button>
       </div>
     </div>
 
-    <div class="content">
-
-      <div class="control-group">
-        <div class="group-header">
-          <div class="group-label">
-             📧 Email Alerts
-             <button class="expand-btn" onclick="toggleList('emailList')">(Edit List)</button>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" id="toggleEmail" checked onchange="saveConfig()">
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div id="emailList" class="input-list">
-          </div>
-        <button class="expand-btn" style="margin-top:5px; color:#666;" onclick="addEmailRow()">+ Add Recipient</button>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">⏱️ SCAN INTERVAL</span>
+        <span id="freqValue" style="font-family:'Orbitron'; color:var(--neon-blue)">10m</span>
       </div>
-
-      <div class="control-group">
-        <div class="group-header">
-          <div class="group-label">
-             👾 Discord Alerts
-             <button class="expand-btn" onclick="toggleList('webhookList')">(Edit List)</button>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" id="toggleDiscord" checked onchange="saveConfig()">
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div id="webhookList" class="input-list">
-           </div>
-        <div style="display:flex; justify-content:space-between; margin-top:5px;">
-           <button class="expand-btn" style="color:#666;" onclick="addWebhookRow()">+ Add Webhook</button>
-           <button class="expand-btn" style="color:#444;" onclick="addPokezonan()">Load Preset</button>
-        </div>
-      </div>
-
-      <div class="control-group">
-         <div class="group-label" style="margin-bottom:8px;">Scan Frequency (+ Jitter)</div>
-         <div class="range-container">
-           <input type="range" id="freqSlider" min="1" max="60" value="10" oninput="document.getElementById('freqDisp').innerText = this.value + 'm'">
-           <span id="freqDisp" class="freq-val">10m</span>
-         </div>
-      </div>
-
-      <button id="btnStart" class="action-btn btn-start" onclick="toggleSystem(true)">Initialize</button>
-      <button id="btnStop" class="action-btn btn-stop" onclick="toggleSystem(false)">Terminate</button>
-
-      <div style="text-align: center;">
-         <button class="expand-btn" onclick="testNotification()">Test Notifications</button>
-      </div>
-
+      <input type="range" id="freqSlider" min="1" max="60" value="10" oninput="updateFreq(this.value)">
+      <div style="font-size:10px; color:#555; margin-top:5px; text-align:right;">+ Random Stealth Jitter</div>
     </div>
 
-    <div id="terminal" class="terminal">
-      <div class="log-entry"><span class="log-time">--:--</span>System Ready.</div>
+    <button id="btnStart" class="power-btn" onclick="toggleSystem(true)">INITIALIZE</button>
+    <button id="btnStop" class="power-btn stop" style="display:none;" onclick="toggleSystem(false)">TERMINATE</button>
+
+    <div class="terminal-window" id="terminal">
+      <div class="log-entry">Waiting for command...</div>
+    </div>
+    
+    <div style="text-align:center; margin-top:10px;">
+        <button class="btn-text" onclick="testAlerts()">[ TEST ALERT SYSTEMS ]</button>
     </div>
 
   </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
-  <script>
-    // --- CONFIG & STATE ---
-    const TARGET_URL = "https://www.pokemoncenter.com/category/trading-card-game";
-    const EMAIL_KEY = "8w7eu6mrg3lRl6ta3"; // Your key
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
+<script>
+    // --- CONFIG ---
+    const TARGET = "https://www.pokemoncenter.com/category/trading-card-game";
+    const EMAIL_KEY = "8w7eu6mrg3lRl6ta3";
     
-    let isRunning = false;
-    let timerId = null;
-    let clockId = null;
+    let running = false;
+    let timerRef = null;
+    let clockRef = null;
     let startTime = 0;
 
-    // Initialize
+    // Init EmailJS
     if(window.emailjs) emailjs.init({ publicKey: EMAIL_KEY });
-    
+
+    // --- SETUP ON LOAD ---
     window.onload = () => {
-      loadConfig();
-      if(document.getElementById('emailList').children.length === 0) addEmailRow();
-      if(document.getElementById('webhookList').children.length === 0) addWebhookRow();
+        loadSettings();
+        if(document.getElementById('emailList').children.length === 0) addEmailRow();
+        if(document.getElementById('discordList').children.length === 0) addWebhookRow();
     };
 
-    // --- UI HELPERS ---
+    // --- UI FUNCTIONS ---
+    function updateFreq(val) { document.getElementById('freqValue').innerText = val + "m"; }
     
-    function log(msg, type='c-info') {
-      const term = document.getElementById('terminal');
-      const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-      const div = document.createElement('div');
-      div.className = 'log-entry';
-      div.innerHTML = `<span class="log-time">${time}</span><span class="${type}">${msg}</span>`;
-      term.insertBefore(div, term.firstChild); // Newest top
+    function toggleView(id) {
+        const el = document.getElementById(id);
+        el.classList.toggle('open');
     }
 
-    function toggleList(id) {
-      const el = document.getElementById(id);
-      el.classList.toggle('expanded');
-    }
-
-    function createRow(val, placeholder, type) {
-      const div = document.createElement('div');
-      div.className = 'input-row';
-      div.innerHTML = `
-        <input type="${type}" value="${val}" placeholder="${placeholder}" onchange="saveConfig()">
-        <button class="btn-mini" onclick="this.parentElement.remove(); saveConfig();">&times;</button>
-      `;
-      return div;
+    function createInput(val, placeholder, type) {
+        const div = document.createElement('div');
+        div.className = 'input-row';
+        div.innerHTML = `<input type="${type}" value="${val}" placeholder="${placeholder}" onchange="saveSettings()"><button class="btn-icon" onclick="this.parentElement.remove(); saveSettings();">×</button>`;
+        return div;
     }
 
     function addEmailRow(val='') {
-      document.getElementById('emailList').appendChild(createRow(val, 'email@example.com', 'email'));
-      document.getElementById('emailList').classList.add('expanded');
+        document.getElementById('emailList').appendChild(createInput(val, 'email@ex.com', 'email'));
+        document.getElementById('emailList').classList.add('open');
     }
 
     function addWebhookRow(val='') {
-      document.getElementById('webhookList').appendChild(createRow(val, 'https://discord...', 'url'));
-      document.getElementById('webhookList').classList.add('expanded');
+        document.getElementById('discordList').appendChild(createInput(val, 'https://discord...', 'url'));
+        document.getElementById('discordList').classList.add('open');
     }
 
     function addPokezonan() {
-      addWebhookRow("https://discord.com/api/webhooks/1418654823745716436/vuMKu1s095Cq3BfU06OF_Z_mwxG39zHppHJ3c4BX5X38WuJFWPGhIZdopWTEEXlophiN");
-      saveConfig();
+        addWebhookRow("https://discord.com/api/webhooks/1418654823745716436/vuMKu1s095Cq3BfU06OF_Z_mwxG39zHppHJ3c4BX5X38WuJFWPGhIZdopWTEEXlophiN");
+        saveSettings();
+        log("Preset Loaded.", "c-success");
+    }
+
+    function log(msg, cls='') {
+        const t = document.getElementById('terminal');
+        const time = new Date().toLocaleTimeString([], {hour12:false});
+        const d = document.createElement('div');
+        d.className = 'log-entry';
+        d.innerHTML = `<span style="color:#333">[${time}]</span> <span class="${cls}">${msg}</span>`;
+        t.insertBefore(d, t.firstChild);
     }
 
     // --- STORAGE ---
-    function saveConfig() {
-      const emails = Array.from(document.getElementById('emailList').querySelectorAll('input')).map(i=>i.value);
-      const hooks = Array.from(document.getElementById('webhookList').querySelectorAll('input')).map(i=>i.value);
-      const settings = {
-        emailOn: document.getElementById('toggleEmail').checked,
-        discordOn: document.getElementById('toggleDiscord').checked,
-        freq: document.getElementById('freqSlider').value
-      };
-      
-      localStorage.setItem('kb_emails', JSON.stringify(emails));
-      localStorage.setItem('kb_hooks', JSON.stringify(hooks));
-      localStorage.setItem('kb_settings', JSON.stringify(settings));
+    function saveSettings() {
+        const ems = Array.from(document.getElementById('emailList').querySelectorAll('input')).map(i=>i.value);
+        const whs = Array.from(document.getElementById('discordList').querySelectorAll('input')).map(i=>i.value);
+        localStorage.setItem('k6_emails', JSON.stringify(ems));
+        localStorage.setItem('k6_hooks', JSON.stringify(whs));
     }
 
-    function loadConfig() {
-      const emails = JSON.parse(localStorage.getItem('kb_emails') || '[]');
-      const hooks = JSON.parse(localStorage.getItem('kb_hooks') || '[]');
-      const settings = JSON.parse(localStorage.getItem('kb_settings'));
-
-      emails.forEach(e => addEmailRow(e));
-      hooks.forEach(h => addWebhookRow(h));
-      
-      if(settings) {
-        document.getElementById('toggleEmail').checked = settings.emailOn;
-        document.getElementById('toggleDiscord').checked = settings.discordOn;
-        document.getElementById('freqSlider').value = settings.freq;
-        document.getElementById('freqDisp').innerText = settings.freq + 'm';
-      }
+    function loadSettings() {
+        const ems = JSON.parse(localStorage.getItem('k6_emails') || '[]');
+        const whs = JSON.parse(localStorage.getItem('k6_hooks') || '[]');
+        ems.forEach(e => addEmailRow(e));
+        whs.forEach(w => addWebhookRow(w));
     }
 
-    // --- SYSTEM LOGIC ---
-
+    // --- CORE SYSTEM ---
     function toggleSystem(state) {
-      isRunning = state;
-      const btnStart = document.getElementById('btnStart');
-      const btnStop = document.getElementById('btnStop');
-      const dot = document.getElementById('statusDot');
+        running = state;
+        const btnStart = document.getElementById('btnStart');
+        const btnStop = document.getElementById('btnStop');
+        const radar = document.getElementById('radar');
+        const status = document.getElementById('statusText');
+        const timeDisp = document.getElementById('timerDisplay');
 
-      if(isRunning) {
-        btnStart.style.display = 'none';
-        btnStop.style.display = 'block';
-        dot.classList.add('active');
-        log("Sequence Initiated.", "c-success");
+        if(running) {
+            btnStart.style.display = 'none';
+            btnStop.style.display = 'block';
+            radar.classList.add('active');
+            status.innerText = "SCANNING TARGET...";
+            status.style.color = "var(--neon-blue)";
+            timeDisp.classList.add('show');
+            
+            startTime = Date.now();
+            clockRef = setInterval(() => {
+                const d = new Date(Date.now() - startTime);
+                timeDisp.innerText = "RUNTIME: " + d.toISOString().substr(11, 8);
+            }, 1000);
+
+            log("System Initialized.", "c-success");
+            runLoop();
+        } else {
+            btnStart.style.display = 'block';
+            btnStop.style.display = 'none';
+            radar.classList.remove('active');
+            status.innerText = "SYSTEM IDLE";
+            status.style.color = "#888";
+            timeDisp.classList.remove('show');
+            
+            clearTimeout(timerRef);
+            clearInterval(clockRef);
+            log("System Halted.", "c-err");
+        }
+    }
+
+    async function runLoop() {
+        if(!running) return;
+
+        log("Pinging Proxies...");
         
-        startTime = Date.now();
-        clockId = setInterval(() => {
-           const d = new Date(Date.now() - startTime);
-           document.getElementById('runTime').innerText = d.toISOString().substr(11, 8);
-        }, 1000);
+        // Stealth Logic
+        const ts = Date.now();
+        const enc = encodeURIComponent(TARGET + `?_=${ts}`);
+        const proxies = [
+            `https://api.allorigins.win/raw?url=${enc}`,
+            `https://corsproxy.io/?${enc}`
+        ];
+
+        let content = "";
         
-        runCheck();
+        for(const p of proxies) {
+            try {
+                const c = new AbortController();
+                setTimeout(()=>c.abort(), 15000);
+                const r = await fetch(p, {signal: c.signal});
+                if(r.ok) {
+                    content = (await r.text()).toLowerCase();
+                    if(r.url.includes("queue-it")) content += " queue-it";
+                    break;
+                }
+            } catch(e) {}
+        }
 
-      } else {
-        btnStart.style.display = 'block';
-        btnStop.style.display = 'none';
-        dot.classList.remove('active');
-        log("Sequence Terminated.", "c-err");
-        clearTimeout(timerId);
-        clearInterval(clockId);
-      }
+        if(!content) {
+            log("Connection Failed.", "c-err");
+        } else {
+            analyze(content);
+        }
+
+        // Schedule Next
+        const mins = parseInt(document.getElementById('freqSlider').value);
+        const ms = (mins * 60000) + Math.floor(Math.random() * 40000);
+        log(`Next scan in ${Math.floor(ms/1000)}s`);
+        timerRef = setTimeout(runLoop, ms);
     }
 
-    async function runCheck() {
-      if(!isRunning) return;
-      
-      log("Checking Target...", "c-info");
-      
-      // PROXY LOGIC
-      const ts = Date.now();
-      const encoded = encodeURIComponent(TARGET_URL + `?t=${ts}`);
-      const proxies = [
-        `https://api.allorigins.win/raw?url=${encoded}`,
-        `https://corsproxy.io/?${encoded}`
-      ];
-
-      let found = false;
-      let content = "";
-      
-      for(const p of proxies) {
-        try {
-          const c = new AbortController();
-          setTimeout(() => c.abort(), 10000);
-          const r = await fetch(p, {signal: c.signal});
-          if(r.ok) {
-            content = (await r.text()).toLowerCase();
-            if(r.url.includes("queue-it")) content += " queue-it";
-            found = true;
-            break;
-          }
-        } catch(e) {}
-      }
-
-      if(!found) {
-        log("Connection Failed (All proxies)", "c-err");
-      } else {
-        analyze(content);
-      }
-
-      // Schedule next
-      const mins = parseInt(document.getElementById('freqSlider').value);
-      const next = (mins * 60000) + Math.floor(Math.random() * 30000); // +0-30s jitter
-      log(`Sleeping ${Math.floor(next/1000)}s`);
-      timerId = setTimeout(runCheck, next);
+    function analyze(html) {
+        if(html.includes("queue-it") || html.includes("users in line")) {
+            log("QUEUE DETECTED!", "c-err");
+            sendAlert("QUEUE ALERT", "Queue detected on TCG page.", "red");
+            playAlarm();
+        } else if(html.includes("add to cart") || html.includes("trading card game")) {
+            log("SHOP ACCESSIBLE!", "c-success");
+            sendAlert("DROP LIVE", "Shop appears open!", "green");
+            playAlarm();
+        } else if(html.includes("cloudflare")) {
+            log("Soft Block (WAF)", "c-warn");
+        } else {
+            log("Target Reachable (No Queue)", "c-success");
+        }
     }
 
-    function analyze(text) {
-      if(text.includes("queue-it") || text.includes("users in line") || text.includes("queue_id")) {
-        log("QUEUE DETECTED!", "c-err");
-        notify("QUEUE ALERT", "You are in a queue!");
-        playBeep();
-      } else if (text.includes("add to cart") || text.includes("trading card game")) {
-        log("SHOP ACCESSIBLE", "c-success");
-        notify("DROP LIVE", "Shop appears accessible.");
-        playBeep();
-      } else if (text.includes("cloudflare") || text.includes("challenge")) {
-        log("Soft Block (Cloudflare)", "c-err");
-      } else {
-        log("Site reachable (No queue)", "c-info");
-      }
+    function sendAlert(title, msg, colorType) {
+        const useEmail = document.getElementById('toggleEmail').checked;
+        const useDiscord = document.getElementById('toggleDiscord').checked;
+
+        // Discord
+        if(useDiscord) {
+            const hooks = Array.from(document.getElementById('discordList').querySelectorAll('input')).map(i=>i.value);
+            const color = colorType === 'red' ? 15548997 : 5763719;
+            hooks.forEach(h => {
+                if(h.includes('http')) {
+                    fetch(h, {
+                        method:"POST", headers:{"Content-Type":"application/json"},
+                        body: JSON.stringify({embeds:[{title:`🚨 ${title}`, description:msg, color:color}]})
+                    }).catch(()=>{});
+                }
+            });
+        }
+
+        // Email
+        if(useEmail) {
+            const mails = Array.from(document.getElementById('emailList').querySelectorAll('input')).map(i=>i.value);
+            mails.forEach(m => {
+                if(m.includes('@')) emailjs.send("service_ahqdaj5", "template_whhvnra", {status: title, details: msg, to_email: m});
+            });
+        }
     }
 
-    function notify(title, msg) {
-      const emailOn = document.getElementById('toggleEmail').checked;
-      const discordOn = document.getElementById('toggleDiscord').checked;
-
-      // DISCORD
-      if(discordOn) {
-        const hooks = Array.from(document.getElementById('webhookList').querySelectorAll('input')).map(i=>i.value).filter(v=>v.includes('http'));
-        hooks.forEach(url => {
-          fetch(url, {
-             method: "POST", headers: {"Content-Type":"application/json"},
-             body: JSON.stringify({embeds:[{title:`🚨 ${title}`, description:msg, color: title.includes("QUEUE")?15158332:3066993}]})
-          }).catch(()=>{});
-        });
-      }
-
-      // EMAIL
-      if(emailOn) {
-         const emails = Array.from(document.getElementById('emailList').querySelectorAll('input')).map(i=>i.value).filter(v=>v.includes('@'));
-         emails.forEach(e => {
-           emailjs.send("service_ahqdaj5", "template_whhvnra", {status: title, details: msg, to_email: e});
-         });
-      }
-    }
-
-    function testNotification() {
-      notify("TEST ALERT", "This is a test notification.");
-      log("Test notifications sent.");
-      playBeep();
+    function testAlerts() {
+        sendAlert("TEST FIRED", "Magikarp Protocol is active.", "green");
+        alert("Test sent! Check Discord/Email.");
     }
 
     // Audio
     const ac = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep() {
-      if(ac.state==='suspended') ac.resume();
-      const o = ac.createOscillator(); const g = ac.createGain();
-      o.connect(g); g.connect(ac.destination);
-      o.type='square'; o.frequency.value=440;
-      g.gain.value=0.1; o.start(); o.stop(ac.currentTime+0.2);
+    function playAlarm() {
+        if(ac.state==='suspended')ac.resume();
+        const o=ac.createOscillator(); const g=ac.createGain();
+        o.connect(g); g.connect(ac.destination);
+        o.type='sawtooth'; o.frequency.value=440;
+        g.gain.value=0.1; o.start(); o.stop(ac.currentTime+0.5);
     }
-  </script>
+</script>
+
 </body>
 </html>
