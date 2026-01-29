@@ -3,299 +3,359 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KRONBORG TITAN v7.0</title>
+  <title>KRONBORG: NEON FORTRESS v8.0</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Chakra+Petch:wght@400;600;700&display=swap');
 
     :root {
-      --bg-dark: #050505;
-      --glass: rgba(15, 15, 25, 0.9);
-      --neon-blue: #00f3ff;
-      --neon-red: #ff0055;
-      --neon-green: #00ff9d;
-      --magikarp: #ff5e00;
-      --text-main: #e0e0e0;
+      --bg-core: #020204;
+      --bg-panel: #0a0a0f;
+      --bg-slot: #000000;
+      
+      --neon-cyan: #00f3ff;
+      --neon-magenta: #ff0055;
+      --neon-amber: #ff9d00;
+      --neon-lime: #ccff00;
+      
+      --border-dim: #333344;
+      --border-bright: #00f3ff;
+      
+      --glass-gloss: rgba(255, 255, 255, 0.03);
     }
 
     * { box-sizing: border-box; outline: none; }
 
     body {
       margin: 0;
-      font-family: 'Rajdhani', sans-serif;
-      background-color: var(--bg-dark);
+      font-family: 'Chakra Petch', sans-serif;
+      background-color: var(--bg-core);
       background-image: 
-        radial-gradient(circle at 50% 0%, #1a1a2e 0%, transparent 50%),
-        linear-gradient(rgba(0, 243, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 243, 255, 0.02) 1px, transparent 1px);
-      background-size: 100% 100%, 40px 40px, 40px 40px;
-      color: var(--text-main);
+        linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+        radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
+      background-size: 50px 50px, 50px 50px, 100% 100%;
+      color: #fff;
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      padding: 40px 20px; /* Padding ensures scrolling works */
+      padding: 40px 20px;
     }
 
-    /* Main Container - WIDER & BIGGER */
-    .titan-container {
+    /* --- THE CHASSIS --- */
+    .fortress-container {
       width: 100%;
-      max-width: 650px; /* Much wider */
-      background: var(--glass);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 24px;
-      backdrop-filter: blur(25px);
+      max-width: 700px;
+      background: var(--bg-panel);
+      border: 2px solid var(--border-dim);
       box-shadow: 
-        0 0 60px rgba(0, 243, 255, 0.15),
-        inset 0 0 30px rgba(0, 0, 0, 0.8);
+        0 0 0 4px rgba(0,0,0,0.5), /* Outer black rim */
+        0 0 60px rgba(0, 243, 255, 0.1); /* Glow */
       position: relative;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
+      clip-path: polygon(
+        0 0, 
+        100% 0, 
+        100% calc(100% - 20px), 
+        calc(100% - 20px) 100%, 
+        0 100%
+      ); /* Cut corner bottom right */
     }
 
-    /* Header */
+    /* Decorative corner accents */
+    .fortress-container::before {
+      content: ''; position: absolute; top: -2px; left: -2px; width: 30px; height: 30px;
+      border-top: 4px solid var(--neon-cyan); border-left: 4px solid var(--neon-cyan);
+    }
+    .fortress-container::after {
+      content: ''; position: absolute; top: -2px; right: -2px; width: 30px; height: 30px;
+      border-top: 4px solid var(--neon-cyan); border-right: 4px solid var(--neon-cyan);
+    }
+
+    /* --- HEADER --- */
     .header {
-      padding: 30px;
-      background: linear-gradient(180deg, rgba(0,243,255,0.05), transparent);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      background: linear-gradient(90deg, #111, #0a0a0f);
+      padding: 25px 30px;
+      border-bottom: 2px solid var(--border-dim);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: relative;
     }
 
-    .header h1 {
+    .header-text h1 {
       font-family: 'Orbitron', sans-serif;
-      font-size: 28px; /* Bigger Title */
+      font-size: 32px;
       margin: 0;
-      color: #fff;
-      text-shadow: 0 0 10px var(--neon-blue);
-      letter-spacing: 3px;
-    }
-
-    .cubone-guard {
-      width: 64px; height: 64px; /* Bigger Icon */
-      background-image: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/104.png');
-      background-size: cover;
-      filter: drop-shadow(0 0 8px rgba(255,255,255,0.3));
-    }
-
-    /* Radar Area */
-    .radar-zone {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .radar-ring {
-      width: 140px; height: 140px;
-      border: 3px dashed rgba(255,255,255,0.1);
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: 0.3s;
-      margin-bottom: 15px;
-    }
-
-    .radar-ring.scanning {
-      border-color: var(--neon-blue);
-      box-shadow: 0 0 40px rgba(0, 243, 255, 0.2);
-      animation: rotateRing 3s linear infinite;
-    }
-
-    @keyframes rotateRing { 100% { transform: rotate(360deg); } }
-
-    .magikarp {
-      width: 96px; height: 96px;
-      background-image: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/129.png');
-      background-size: cover;
-      image-rendering: pixelated;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      background: linear-gradient(to bottom, #fff, var(--neon-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 5px var(--neon-cyan));
     }
     
-    .radar-ring.scanning .magikarp { animation: flop 0.4s infinite alternate; }
-    @keyframes flop { 0% { transform: rotate(-10deg); } 100% { transform: rotate(10deg); } }
+    .header-sub { font-size: 12px; color: #666; letter-spacing: 2px; margin-top: 4px; font-weight: 700; }
 
-    .status-text { font-family: 'Orbitron'; font-size: 18px; color: #888; letter-spacing: 1px; }
-    .status-timer { font-family: monospace; font-size: 14px; color: var(--neon-blue); margin-top: 5px; opacity: 0; }
-    .status-timer.visible { opacity: 1; }
+    .guardian-box {
+      width: 60px; height: 60px;
+      border: 1px solid var(--border-dim);
+      background: #000;
+      display: flex; justify-content: center; align-items: center;
+      box-shadow: inset 0 0 10px rgba(0,0,0,1);
+    }
+    .cubone { width: 48px; height: 48px; background: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/104.png') no-repeat center/cover; opacity: 0.8; }
 
-    /* Content Area */
-    .content-body { padding: 30px; }
-
-    /* Settings Panels */
-    .control-panel {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
+    /* --- MONITOR SECTION --- */
+    .monitor-frame {
+      background: #000;
+      margin: 20px 30px 0;
+      border: 2px solid #333;
+      border-top: 4px solid #555;
+      border-radius: 4px;
       padding: 20px;
-      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 50px rgba(0,243,255,0.05);
     }
 
-    .panel-head {
+    /* Scanline Effect */
+    .monitor-frame::after {
+      content: " ";
+      display: block;
+      position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 2;
+      background-size: 100% 2px, 3px 100%;
+      pointer-events: none;
+    }
+
+    .radar-circle {
+      width: 100px; height: 100px;
+      border: 2px dashed #444;
+      border-radius: 50%;
+      display: flex; justify-content: center; align-items: center;
+      position: relative;
+    }
+    .radar-circle.active {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 20px var(--neon-cyan);
+      animation: spin 4s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .magikarp { width: 70px; height: 70px; background: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/129.png') no-repeat center/cover; image-rendering: pixelated; z-index: 3; }
+    .radar-circle.active .magikarp { animation: flop 0.5s infinite; }
+    @keyframes flop { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(15deg) translateY(-5px); } }
+
+    .status-data { z-index: 3; flex: 1; }
+    .status-title { font-size: 14px; color: #555; letter-spacing: 1px; margin-bottom: 5px; }
+    .status-value { font-family: 'Orbitron'; font-size: 24px; color: #888; text-shadow: 0 0 5px rgba(255,255,255,0.1); }
+    .status-time { font-family: monospace; color: var(--neon-cyan); margin-top: 5px; opacity: 0; }
+    
+    /* --- CONTROLS AREA --- */
+    .deck { padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+
+    /* PANEL STYLING */
+    .panel {
+      background: rgba(20, 20, 25, 0.6);
+      border: 1px solid var(--border-dim);
+      border-left: 4px solid var(--border-dim); /* Thick left accent */
+      padding: 15px;
+      transition: 0.3s;
+    }
+    .panel:hover { border-left-color: var(--neon-cyan); background: rgba(20, 20, 25, 1); box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+
+    .panel-header {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 15px;
+      border-bottom: 1px solid #222;
+      padding-bottom: 10px;
     }
-    .panel-title { font-size: 16px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px; }
+    .panel-label { font-family: 'Orbitron'; font-size: 14px; color: #fff; letter-spacing: 1px; }
 
-    /* Big Inputs */
-    .input-group { display: flex; gap: 10px; margin-bottom: 10px; }
+    /* INPUTS - The "Designed" Look */
+    .input-slot {
+      display: flex; gap: 0;
+      background: var(--bg-slot);
+      border: 1px solid #444;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .input-slot:focus-within { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
+
+    .slot-icon {
+      background: #111;
+      width: 40px;
+      display: flex; justify-content: center; align-items: center;
+      font-size: 12px; color: #666;
+      border-right: 1px solid #333;
+    }
     
     input[type="text"] {
       flex: 1;
-      padding: 12px 15px; /* Bigger click area */
-      font-size: 16px;
-      background: #000;
-      border: 1px solid #333;
-      border-radius: 8px;
-      color: var(--neon-blue);
-      font-family: 'Rajdhani', sans-serif;
+      background: transparent;
+      border: none;
+      padding: 12px 15px;
+      color: #fff;
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 14px;
     }
-    input:focus { border-color: var(--neon-blue); }
 
-    button { cursor: pointer; transition: 0.2s; font-family: 'Rajdhani', sans-serif; }
-
-    .btn-del {
-      width: 45px; background: #111; border: 1px solid #333; color: #666; font-size: 20px; border-radius: 8px;
+    .btn-x {
+      background: #111; border: none; border-left: 1px solid #333;
+      color: #666; width: 40px; cursor: pointer; transition: 0.2s;
     }
-    .btn-del:hover { border-color: var(--neon-red); color: var(--neon-red); }
+    .btn-x:hover { background: var(--neon-magenta); color: #fff; }
 
     .btn-add {
-      background: transparent; border: 1px dashed #444; color: #888;
-      width: 100%; padding: 10px; border-radius: 8px; font-weight: 600;
-      margin-top: 5px;
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px dashed #444;
+      color: #888;
+      padding: 8px;
+      font-size: 12px;
+      text-transform: uppercase;
+      cursor: pointer;
     }
-    .btn-add:hover { border-color: var(--neon-blue); color: var(--neon-blue); }
+    .btn-add:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); background: rgba(0, 243, 255, 0.05); }
 
-    /* Toggle Switch (Bigger) */
-    .toggle {
-      width: 50px; height: 26px; background: #333; border-radius: 13px;
+    /* TOGGLES */
+    .cyber-toggle {
+      appearance: none; width: 40px; height: 20px;
+      background: #222; border: 1px solid #444;
       position: relative; cursor: pointer;
     }
-    .toggle::after {
-      content:''; position: absolute; top: 3px; left: 3px;
-      width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: 0.3s;
+    .cyber-toggle::after {
+      content:''; position: absolute; top: 2px; left: 2px;
+      width: 14px; height: 14px; background: #666; transition: 0.3s;
     }
-    input:checked + .toggle { background: var(--neon-green); }
-    input:checked + .toggle::after { transform: translateX(24px); }
+    .cyber-toggle:checked { border-color: var(--neon-lime); background: rgba(204, 255, 0, 0.1); }
+    .cyber-toggle:checked::after { transform: translateX(20px); background: var(--neon-lime); }
 
-    /* Range Slider */
-    input[type=range] { width: 100%; height: 6px; background: #333; border-radius: 3px; accent-color: var(--neon-blue); margin-top: 10px; }
+    /* SLIDER */
+    .slider-track {
+      width: 100%; height: 20px; background: #000; border: 1px solid #333;
+      display: flex; align-items: center; padding: 0 5px; margin-top: 10px;
+    }
+    input[type=range] { width: 100%; height: 4px; background: #333; accent-color: var(--neon-cyan); }
 
-    /* Start/Stop Buttons */
-    .action-btn {
+    /* BIG BUTTONS */
+    .main-btn {
       width: 100%;
       padding: 20px;
-      font-size: 20px;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
-      letter-spacing: 2px;
-      border: none;
-      border-radius: 12px;
-      margin-top: 10px;
+      font-family: 'Orbitron'; font-weight: 900; font-size: 18px; letter-spacing: 2px;
+      border: 1px solid var(--neon-cyan);
+      background: linear-gradient(180deg, rgba(0, 243, 255, 0.1), rgba(0, 243, 255, 0));
+      color: var(--neon-cyan);
+      cursor: pointer;
       text-transform: uppercase;
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+      transition: 0.2s;
+      position: relative;
+      overflow: hidden;
     }
-    
-    .start { background: var(--neon-blue); color: #000; box-shadow: 0 0 25px rgba(0, 243, 255, 0.3); }
-    .start:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(0, 243, 255, 0.5); }
-    
-    .stop { background: var(--neon-red); color: #fff; display: none; box-shadow: 0 0 25px rgba(255, 0, 85, 0.3); }
-    .stop:hover { background: #ff3366; }
+    .main-btn::before {
+      content:''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--neon-cyan);
+    }
+    .main-btn:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 30px var(--neon-cyan); }
 
-    /* THE DETECTIVE LOG */
-    .log-container {
-      background: #080808;
+    .stop-btn {
+      border-color: var(--neon-magenta); color: var(--neon-magenta);
+      background: linear-gradient(180deg, rgba(255, 0, 85, 0.1), transparent);
+      display: none;
+    }
+    .stop-btn::before { background: var(--neon-magenta); }
+    .stop-btn:hover { background: var(--neon-magenta); color: #fff; box-shadow: 0 0 30px var(--neon-magenta); }
+
+    /* LOG SCREEN */
+    .log-screen {
+      height: 150px;
+      background: #000;
       border: 1px solid #333;
-      border-radius: 12px;
-      height: 200px; /* Taller log */
-      padding: 15px;
+      padding: 10px;
+      font-family: 'Courier New', monospace; font-size: 12px;
       overflow-y: auto;
-      margin-top: 25px;
-      font-family: 'Courier New', monospace;
-      font-size: 13px; /* Readable text */
-      display: flex;
-      flex-direction: column-reverse; /* New items at bottom physically, looks like top */
+      display: flex; flex-direction: column-reverse;
+      box-shadow: inset 0 0 20px #000;
     }
+    .log-entry { padding: 2px 0; border-bottom: 1px solid #111; }
+    .c-time { color: #444; margin-right: 8px; }
+    .c-green { color: var(--neon-lime); }
+    .c-red { color: var(--neon-magenta); }
+    .c-blue { color: var(--neon-cyan); }
     
-    .log-row { margin-bottom: 6px; border-bottom: 1px solid #111; padding-bottom: 4px; }
-    .log-time { color: #555; margin-right: 10px; }
-    .msg-info { color: #aaa; }
-    .msg-success { color: var(--neon-green); }
-    .msg-err { color: var(--neon-red); }
-    .msg-detail { color: #666; font-style: italic; margin-left: 5px; }
-
-    .hidden { display: none; }
-
   </style>
 </head>
 <body>
 
-  <div class="titan-container">
+  <div class="fortress-container">
     
     <div class="header">
-      <div>
+      <div class="header-text">
         <h1>KRONBORG</h1>
-        <div style="font-size: 12px; color: #888; letter-spacing: 2px;">PROJECT TITAN v7.0</div>
+        <div class="header-sub">FORTRESS PROTOCOL v8.0</div>
       </div>
-      <div class="cubone-guard" title="System Guardian"></div>
+      <div class="guardian-box">
+        <div class="cubone" title="Systems Guardian"></div>
+      </div>
     </div>
 
-    <div class="radar-zone">
-      <div class="radar-ring" id="radar">
+    <div class="monitor-frame">
+      <div class="radar-circle" id="radar">
         <div class="magikarp"></div>
       </div>
-      <div class="status-text" id="statusText">SYSTEM OFFLINE</div>
-      <div class="status-timer" id="timer">RUN TIME: 00:00:00</div>
+      <div class="status-data">
+        <div class="status-title">SYSTEM STATUS</div>
+        <div class="status-value" id="statusVal">OFFLINE</div>
+        <div class="status-time" id="timer">T+ 00:00:00</div>
+      </div>
     </div>
 
-    <div class="content-body">
-
-      <div class="control-panel">
-        <div class="panel-head">
-          <div class="panel-title">📧 Email Alerts</div>
-          <label>
-            <input type="checkbox" id="checkEmail" checked class="hidden" onchange="save()">
-            <div class="toggle"></div>
-          </label>
+    <div class="deck">
+      
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-label">EMAIL COMM LINK</span>
+          <input type="checkbox" class="cyber-toggle" id="emailToggle" checked>
         </div>
         <div id="emailList"></div>
-        <button class="btn-add" onclick="addEmail()">+ ADD EMAIL RECIPIENT</button>
+        <button class="btn-add" onclick="addEmail()">[ + Add Recipient ]</button>
       </div>
 
-      <div class="control-panel">
-        <div class="panel-head">
-          <div class="panel-title">👾 Discord Webhooks</div>
-          <label>
-            <input type="checkbox" id="checkDiscord" checked class="hidden" onchange="save()">
-            <div class="toggle"></div>
-          </label>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-label">DISCORD UPLINK</span>
+          <input type="checkbox" class="cyber-toggle" id="discordToggle" checked>
         </div>
         <div id="discordList"></div>
-        <button class="btn-add" onclick="addDiscord()">+ ADD WEBHOOK URL</button>
-        <button class="btn-add" style="border-style: solid; border-color: #333; color: var(--neon-blue); margin-top: 10px;" onclick="loadPokezonan()">⚡ LOAD "POKEZONAN" PRESET</button>
+        <button class="btn-add" onclick="addDiscord()">[ + Add Webhook ]</button>
+        <button class="btn-add" style="margin-top:5px; border-color:var(--neon-amber); color:var(--neon-amber)" onclick="addPokezonan()">[ ⚡ Load Preset: Pokezonan ]</button>
       </div>
 
-      <div class="control-panel">
-        <div class="panel-head">
-          <div class="panel-title">⏱️ Check Interval</div>
-          <div style="color: var(--neon-blue); font-size: 18px; font-weight: bold;" id="freqVal">10m</div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-label">SCAN INTERVAL</span>
+          <span class="panel-label" style="color:var(--neon-cyan)" id="freqVal">10m</span>
         </div>
-        <input type="range" id="freqSlider" min="1" max="60" value="10" oninput="updateFreq(this.value)">
-        <div style="margin-top: 5px; color: #666; font-size: 14px;">Includes stealth "Jitter" (±60s random delay)</div>
-      </div>
-
-      <button id="btnStart" class="action-btn start" onclick="toggleSystem(true)">START MONITORING</button>
-      <button id="btnStop" class="action-btn stop" onclick="toggleSystem(false)">STOP SYSTEM</button>
-
-      <div class="log-container" id="logWindow">
-        <div class="log-row">
-          <span class="log-time">--:--:--</span>
-          <span class="msg-info">System initialized. Ready to start.</span>
+        <div class="slider-track">
+          <input type="range" id="freqSlider" min="1" max="60" value="10" oninput="updFreq(this.value)">
         </div>
+        <div style="font-size:10px; color:#555; margin-top:5px; text-align:right;">STEALTH JITTER ENABLED (±60s)</div>
       </div>
 
-      <div style="text-align: center; margin-top: 20px;">
-        <button style="background:none; border:none; color:#444; text-decoration: underline;" onclick="testAlerts()">Test Notification System</button>
+      <button id="btnStart" class="main-btn" onclick="toggleSys(true)">INITIALIZE SYSTEM</button>
+      <button id="btnStop" class="main-btn stop-btn" onclick="toggleSys(false)">ABORT SEQUENCE</button>
+
+      <div class="log-screen" id="log">
+        <div class="log-entry"><span class="c-time">--:--</span>System initialized. Waiting for input.</div>
+      </div>
+
+      <div style="text-align: center;">
+        <button style="background:none; border:none; color:#444; font-size:10px; text-decoration:underline; cursor:pointer;" onclick="test()">RUN DIAGNOSTIC (TEST NOTIFICATION)</button>
       </div>
 
     </div>
@@ -303,243 +363,193 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
 <script>
-    // --- SETUP ---
-    const TARGET = "https://www.pokemoncenter.com/category/trading-card-game";
-    const EMAIL_KEY = "8w7eu6mrg3lRl6ta3";
-    
-    let isRunning = false;
-    let scanTimeout = null;
-    let clockInterval = null;
-    let startTime = 0;
+    const CONFIG = {
+        target: "https://www.pokemoncenter.com/category/trading-card-game",
+        emailKey: "8w7eu6mrg3lRl6ta3"
+    };
 
-    // Init EmailJS
-    if(window.emailjs) emailjs.init({ publicKey: EMAIL_KEY });
+    let running = false;
+    let timerRef = null;
+    let clockRef = null;
+    let startTs = 0;
 
-    // --- LOAD SAVED DATA ---
+    if(window.emailjs) emailjs.init({ publicKey: CONFIG.emailKey });
+
     window.onload = () => {
-        loadData();
+        load();
         if(document.getElementById('emailList').children.length === 0) addEmail();
         if(document.getElementById('discordList').children.length === 0) addDiscord();
-    }
+    };
 
-    // --- UI FUNCTIONS ---
-    function updateFreq(val) {
-        document.getElementById('freqVal').innerText = val + "m";
-        save();
-    }
+    function updFreq(v) { document.getElementById('freqVal').innerText = v + "m"; save(); }
 
-    function createInput(val, ph, type) {
+    function createRow(val, icon, ph, type) {
         const div = document.createElement('div');
-        div.className = 'input-group';
+        div.className = 'input-slot';
         div.innerHTML = `
+            <div class="slot-icon">${icon}</div>
             <input type="${type}" value="${val}" placeholder="${ph}" onchange="save()">
-            <button class="btn-del" onclick="this.parentElement.remove(); save()">×</button>
+            <button class="btn-x" onclick="this.parentElement.remove(); save()">×</button>
         `;
         return div;
     }
 
-    function addEmail(val='') {
-        document.getElementById('emailList').appendChild(createInput(val, 'name@example.com', 'email'));
+    function addEmail(v='') { document.getElementById('emailList').appendChild(createRow(v, '@', 'email@addr.com', 'email')); }
+    function addDiscord(v='') { document.getElementById('discordList').appendChild(createRow(v, '#', 'https://discord...', 'url')); }
+    function addPokezonan() { addDiscord("https://discord.com/api/webhooks/1418654823745716436/vuMKu1s095Cq3BfU06OF_Z_mwxG39zHppHJ3c4BX5X38WuJFWPGhIZdopWTEEXlophiN"); save(); }
+
+    function log(msg, color='c-blue') {
+        const d = document.getElementById('log');
+        const r = document.createElement('div');
+        r.className = 'log-entry';
+        r.innerHTML = `<span class="c-time">${new Date().toLocaleTimeString()}</span><span class="${color}">${msg}</span>`;
+        d.insertBefore(r, d.firstChild);
     }
 
-    function addDiscord(val='') {
-        document.getElementById('discordList').appendChild(createInput(val, 'https://discord.com/api/webhooks/...', 'url'));
-    }
-
-    function loadPokezonan() {
-        addDiscord("https://discord.com/api/webhooks/1418654823745716436/vuMKu1s095Cq3BfU06OF_Z_mwxG39zHppHJ3c4BX5X38WuJFWPGhIZdopWTEEXlophiN");
-        save();
-        log("System", "Loaded 'Pokezonan' webhook preset.", "msg-success");
-    }
-
-    // --- LOGGING ---
-    function log(category, msg, styleClass='msg-info') {
-        const win = document.getElementById('logWindow');
-        const time = new Date().toLocaleTimeString();
-        
-        const row = document.createElement('div');
-        row.className = 'log-row';
-        row.innerHTML = `
-            <span class="log-time">${time}</span>
-            <strong style="color:#666">[${category}]</strong>
-            <span class="${styleClass}">${msg}</span>
-        `;
-        
-        win.insertBefore(row, win.firstChild);
-        // Keep memory low
-        if(win.children.length > 50) win.lastChild.remove();
-    }
-
-    // --- STORAGE ---
     function save() {
-        const data = {
-            emails: Array.from(document.getElementById('emailList').querySelectorAll('input')).map(i=>i.value),
-            hooks: Array.from(document.getElementById('discordList').querySelectorAll('input')).map(i=>i.value),
-            emailOn: document.getElementById('checkEmail').checked,
-            discordOn: document.getElementById('checkDiscord').checked,
-            freq: document.getElementById('freqSlider').value
+        const d = {
+            ems: Array.from(document.getElementById('emailList').querySelectorAll('input')).map(i=>i.value),
+            whs: Array.from(document.getElementById('discordList').querySelectorAll('input')).map(i=>i.value),
+            eOn: document.getElementById('emailToggle').checked,
+            dOn: document.getElementById('discordToggle').checked,
+            frq: document.getElementById('freqSlider').value
         };
-        localStorage.setItem('kronborg_v7', JSON.stringify(data));
+        localStorage.setItem('k8_conf', JSON.stringify(d));
     }
 
-    function loadData() {
-        const data = JSON.parse(localStorage.getItem('kronborg_v7'));
-        if(!data) return;
-        
-        data.emails.forEach(e => addEmail(e));
-        data.hooks.forEach(h => addDiscord(h));
-        document.getElementById('checkEmail').checked = data.emailOn;
-        document.getElementById('checkDiscord').checked = data.discordOn;
-        document.getElementById('freqSlider').value = data.freq;
-        updateFreq(data.freq);
+    function load() {
+        const d = JSON.parse(localStorage.getItem('k8_conf'));
+        if(!d) return;
+        d.ems.forEach(e=>addEmail(e));
+        d.whs.forEach(w=>addDiscord(w));
+        document.getElementById('emailToggle').checked = d.eOn;
+        document.getElementById('discordToggle').checked = d.dOn;
+        document.getElementById('freqSlider').value = d.frq;
+        updFreq(d.frq);
     }
 
-    // --- CORE LOGIC ---
-    function toggleSystem(on) {
-        isRunning = on;
-        const btnStart = document.getElementById('btnStart');
-        const btnStop = document.getElementById('btnStop');
+    function toggleSys(on) {
+        running = on;
+        const bStart = document.getElementById('btnStart');
+        const bStop = document.getElementById('btnStop');
         const radar = document.getElementById('radar');
-        const status = document.getElementById('statusText');
-        const timer = document.getElementById('timer');
+        const stat = document.getElementById('statusVal');
+        const time = document.getElementById('timer');
 
         if(on) {
-            btnStart.style.display = 'none';
-            btnStop.style.display = 'block';
-            radar.classList.add('scanning');
-            status.innerText = "SEARCHING FOR QUEUE...";
-            status.style.color = "var(--neon-blue)";
-            timer.classList.add('visible');
+            bStart.style.display = 'none';
+            bStop.style.display = 'block';
+            radar.classList.add('active');
+            stat.innerText = "SCANNING";
+            stat.style.color = "var(--neon-cyan)";
+            stat.style.textShadow = "0 0 10px var(--neon-cyan)";
+            time.style.opacity = 1;
             
-            startTime = Date.now();
-            clockInterval = setInterval(() => {
-                const d = new Date(Date.now() - startTime);
-                timer.innerText = "RUN TIME: " + d.toISOString().substr(11, 8);
+            startTs = Date.now();
+            clockRef = setInterval(() => {
+               const d = new Date(Date.now() - startTs);
+               time.innerText = "T+ " + d.toISOString().substr(11, 8);
             }, 1000);
-
-            log("System", "Monitoring started. Stealth Mode Active.", "msg-success");
-            runCheck();
-        } else {
-            btnStart.style.display = 'block';
-            btnStop.style.display = 'none';
-            radar.classList.remove('scanning');
-            status.innerText = "SYSTEM OFFLINE";
-            status.style.color = "#888";
-            timer.classList.remove('visible');
             
-            clearTimeout(scanTimeout);
-            clearInterval(clockInterval);
-            log("System", "Monitoring stopped by user.", "msg-err");
+            log("System initialized. Stealth protocol active.", "c-green");
+            run();
+        } else {
+            bStart.style.display = 'block';
+            bStop.style.display = 'none';
+            radar.classList.remove('active');
+            stat.innerText = "OFFLINE";
+            stat.style.color = "#888";
+            stat.style.textShadow = "none";
+            time.style.opacity = 0;
+            
+            clearTimeout(timerRef);
+            clearInterval(clockRef);
+            log("System halted.", "c-red");
         }
     }
 
-    async function runCheck() {
-        if(!isRunning) return;
-
-        log("Scanner", "Connecting via Proxy Mesh...", "msg-info");
-
-        const ts = Date.now();
-        const enc = encodeURIComponent(TARGET + `?t=${ts}`);
-        // Rotation to prevent blocking
-        const proxies = [
-            `https://api.allorigins.win/raw?url=${enc}`,
-            `https://corsproxy.io/?${enc}`
-        ];
-
-        let content = "";
-        let finalUrl = "";
+    async function run() {
+        if(!running) return;
         
-        // Fetch Logic
+        log("Pinging target proxies...");
+        const ts = Date.now();
+        const enc = encodeURIComponent(CONFIG.target + `?z=${ts}`);
+        const proxies = [`https://api.allorigins.win/raw?url=${enc}`, `https://corsproxy.io/?${enc}`];
+        
+        let html = "";
+        let final = "";
+
         for(const p of proxies) {
             try {
                 const c = new AbortController();
-                setTimeout(()=>c.abort(), 15000); // 15s timeout
-                const res = await fetch(p, {signal: c.signal});
-                if(res.ok) {
-                    content = (await res.text()).toLowerCase();
-                    finalUrl = res.url;
+                setTimeout(()=>c.abort(), 15000);
+                const r = await fetch(p, {signal:c.signal});
+                if(r.ok) {
+                    html = (await r.text()).toLowerCase();
+                    final = r.url;
                     break;
                 }
-            } catch(e) {
-                // Silent fail to next proxy
-            }
+            } catch(e){}
         }
 
-        // Analysis
-        if(!content) {
-            log("Error", "Network unreachable. All proxies failed.", "msg-err");
+        if(!html) {
+            log("Connection failed (All Proxies).", "c-red");
         } else {
-            analyze(content, finalUrl);
+            analyze(html, final);
         }
 
-        // Schedule Next
-        const mins = parseInt(document.getElementById('freqSlider').value);
-        const jitter = Math.floor(Math.random() * 60000); // 0-60s random
-        const nextMs = (mins * 60000) + jitter;
+        const m = parseInt(document.getElementById('freqSlider').value);
+        const next = (m * 60000) + Math.floor(Math.random()*60000);
+        log(`Next scan in ${Math.floor(next/1000)}s`);
+        timerRef = setTimeout(run, next);
+    }
+
+    function analyze(h, u) {
+        if(u.includes("queue-it") || h.includes("users in line")) {
+            log("QUEUE DETECTED!", "c-red");
+            notify("QUEUE ALERT", "You are in a queue!", "red");
+            beep();
+        } else if(h.includes("add to cart") || h.includes("trading card game")) {
+            log("Shop Accessible.", "c-green");
+            // notify("DROP LIVE", "Shop is open.", "green"); // Uncomment for drop alerts
+        } else if(h.includes("cloudflare")) {
+            log("Soft Block (WAF). Skipping.", "c-blue");
+        } else {
+            log("No queue detected.", "c-blue");
+        }
+    }
+
+    function notify(t, m, c) {
+        const eOn = document.getElementById('emailToggle').checked;
+        const dOn = document.getElementById('discordToggle').checked;
+
+        if(dOn) {
+            const hks = Array.from(document.getElementById('discordList').querySelectorAll('input')).map(i=>i.value).filter(v=>v.includes('http'));
+            const col = c==='red'?15548997:5763719;
+            hks.forEach(u => fetch(u, {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                body: JSON.stringify({embeds:[{title:`🚨 ${t}`, description:m, color:col}]})
+            }).catch(()=>{}));
+        }
         
-        log("Scheduler", `Next scan in ${Math.floor(nextMs/1000)} seconds.`, "msg-detail");
-        scanTimeout = setTimeout(runCheck, nextMs);
-    }
-
-    function analyze(html, url) {
-        // 1. Check for Queue
-        if (url.includes("queue-it") || html.includes("users in line") || html.includes("queue_id")) {
-            log("ALERT", "QUEUE DETECTED! Redirect found.", "msg-err");
-            sendNotify("QUEUE DETECTED", "You are in a queue! Check immediately.", "red");
-            playAlarm();
-        }
-        // 2. Check for Soft Block
-        else if (html.includes("cloudflare") || html.includes("challenge") || html.includes("just a moment")) {
-            log("WAF", "Soft-Block (Cloudflare). Retrying next cycle.", "msg-detail");
-        }
-        // 3. Check for Success
-        else if (html.includes("add to cart") || html.includes("trading card game")) {
-            log("Status", "Shop Accessible. 'Add to Cart' found.", "msg-success");
-            // Optional: Alert on Drop (uncomment if you want alerts when shop is just open)
-            // sendNotify("SHOP OPEN", "Site is accessible.", "green");
-        }
-        // 4. Default / No Queue
-        else {
-            log("Analysis", "Site reachable. No queue keywords found.", "msg-info");
+        if(eOn) {
+            const ems = Array.from(document.getElementById('emailList').querySelectorAll('input')).map(i=>i.value).filter(v=>v.includes('@'));
+            ems.forEach(e => emailjs.send("service_ahqdaj5", "template_whhvnra", {status:t, details:m, to_email:e}));
         }
     }
 
-    function sendNotify(title, msg, color) {
-        const useEmail = document.getElementById('checkEmail').checked;
-        const useDiscord = document.getElementById('checkDiscord').checked;
-        
-        if(useDiscord) {
-            const hooks = Array.from(document.getElementById('discordList').querySelectorAll('input')).map(i=>i.value).filter(v=>v.includes('http'));
-            const hexColor = color === 'red' ? 15548997 : 5763719;
-            hooks.forEach(h => {
-                fetch(h, {
-                    method:"POST", headers:{"Content-Type":"application/json"},
-                    body:JSON.stringify({embeds:[{title:`🚨 ${title}`, description:msg, color:hexColor}]})
-                }).catch(e=>console.log(e));
-            });
-        }
-
-        if(useEmail) {
-            const emails = Array.from(document.getElementById('emailList').querySelectorAll('input')).map(i=>i.value).filter(v=>v.includes('@'));
-            emails.forEach(e => {
-                emailjs.send("service_ahqdaj5", "template_whhvnra", {status: title, details: msg, to_email: e});
-            });
-        }
-    }
-
-    function testAlerts() {
-        sendNotify("TEST ALERT", "Magikarp Protocol Operational.", "green");
-        log("Test", "Test notifications dispatched.", "msg-success");
-        playAlarm();
+    function test() {
+        notify("TEST DIAGNOSTIC", "System systems functional.", "green");
+        log("Diagnostic signal sent.", "c-green");
+        beep();
     }
 
     const ac = new (window.AudioContext || window.webkitAudioContext)();
-    function playAlarm() {
-        if(ac.state==='suspended') ac.resume();
-        const o = ac.createOscillator(); const g = ac.createGain();
+    function beep() {
+        if(ac.state==='suspended')ac.resume();
+        const o=ac.createOscillator(); const g=ac.createGain();
         o.connect(g); g.connect(ac.destination);
-        o.type='square'; o.frequency.value=600;
-        g.gain.value=0.1; 
+        o.type='square'; o.frequency.value=600; g.gain.value=0.1;
         o.start(); o.stop(ac.currentTime+0.2);
     }
 </script>
